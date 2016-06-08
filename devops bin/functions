@@ -1,0 +1,256 @@
+#!/bin/bash
+# bash shell scripts shared function library
+# @date:            23feb15
+# @name:            functions
+# @description:     Library of functions for root bash scripts
+
+# @variables:
+libVersion="0"
+DBPASS="St1ckyB1t"
+count="cat /root/.count"                # pull count from git commit ID
+X=$0                                    # save $0 - aka cmdName
+Y=${X##*/}                              # remove dir part
+Z=${Y%.*}                               # remove the extension
+sLogDir="/var/log/example"
+logFile="${sLogDir}/${Z}_${HOSTNAME}_$(date +"%Y%m%d.%H%M").log"
+statFile="${sLogDir}/status.log"
+LOCKFILE="${sLogDir}/${Z}.lock"
+LOCKFD="99"
+# setup vault object variables
+address="192.168.3.126:8080"
+container="testContainer"
+target="${address}/v1/default/${container}"
+testObject="512mb-test.img"
+fName="/root/${testObject}"
+# TODO -- fix this line, it breaks functions file when $address is un-reachable
+#auth_key="$(curl -i -k -H 'x-auth-user:admin' -H 'X-Auth-Key:password' ${address}/auth -X GET --silent | grep X-Auth-Token | awk '{print $2}')"
+
+# setup LOCKFILE to ensure only a single instance
+_lock()             { flock -$1 $LOCKFD; }
+_no_more_locking()  { _lock u; _lock xn && rm -f $LOCKFILE; }
+_prepare_locking()  { eval "exec $LOCKFD>\"$LOCKFILE\""; trap _no_more_locking EXIT; }
+exlock_now()        { _lock xn; }       # obtain an exclusive lock immediately or fail
+exlock()            { _lock x; }        # obtain an exclusive lock
+shlock()            { _lock s; }        # obtain a shared lock
+unlock()            { _lock u; }        # drop a lock
+
+# find *files* older than x and remove [+] find *files* older than x and move to archives
+delWeek()           { find $1 -mtime +7 -exec rm {} \;; }
+delMonth()          { find $1 -mtime +31 -exec rm {} \;; }
+delYear()           { find $1 -mtime +365 -exec rm {} \;; }
+archiveWeek()       { find $1 -mtime +7 -exec mv {} /opt/archives \;; }
+archiveMonth()      { find $1 -mtime +31 -exec mv {} /opt/archives \;; }
+archiveYear()       { find $1 -mtime +365 -exec mv {} /opt/archives \;; }
+
+# sort-able times 20141009.1353
+timeSort()          { date +"%Y%m%d.%H%M"; }
+timeStamp()         { date; }
+
+# write out to logfile only [+] write out to console & logfile [+] write out to logfile & console & status file
+log()               { echo "$(timeStamp): $*" >>${logFile}; }
+logCon()            { echo "$(timeStamp): $*"; echo "$(timeStamp): $*">>${logFile}; }
+logTee()            { echo "$(timeStamp): $*" | tee -a $logFile; echo "$(timeStamp): $*">>${statFile}; }
+
+# write errors to logfile and console then exit 1
+error()             { logCon "[ERROR] $*"; exit 1; }
+
+# check if a dir exists and create if missing
+createDir()         {
+  if [ ! -d "$1" ]; then
+    logCon "[pre-flight] creating directory $1"; mkdir -p "$1" || error "Failed to create directory $1"
+  else
+    logCon "[pre-flight] directory already exists -- $1"
+  fi
+}
+
+# enable logging for background script [+] exit logging messages for BG scripts
+logsOn()            { createDir $sLogDir; exec 2>>${logFile}; logTee "  *  *  * "; logTee "START ${Z} process "; }
+logsOff()           { logTee "END ${Z} process completed "; logTee "  *  *  * "; }
+
+# if lockfile is NOT found, obtain an exclusive lock and run program
+checkLock()         { _prepare_locking; exlock_now || error "$Z is still running or a stale lockfile exists -- check $LOCKFILE"; }
+
+# check to see if last command passed cleanly, if not exit
+checkLast()         {
+  if [ ! $1 -eq 0 ]; then
+    error "command execution failed -- check $2"
+  fi
+}
+
+# verify cmd run as root user
+checkRoot()         {
+  if [ "$USER" != "root" ]; then
+    error "$Z should be run by root user "
+  fi
+}
+
+# verify kernel version
+checkKernel()       {
+  if [ `uname -r` != "$1" ]; then
+    error "Wrong kernel version -- requires $1"
+  fi
+}
+
+# scan the dpkg Packages and over-write
+scanDpkg()          { cd $1; dpkg-scanpackages -m . /dev/null | gzip -9c > Packages.gz; }
+
+# fix permissions and owner / group to example
+fixPerms()      {
+  if [ -d /opt/example ]; then
+    logCon "checking /opt/example folder perms and ownership ... "
+    chmod -R 700 /opt/example
+    cd /opt/$branch/example
+    find . -type d -exec chmod 755 {} \;
+    chmod 444 /opt/example/Makefile
+    chmod 444 /opt/example/requirements.txt
+    chmod 444 /opt/example/version
+    chmod 755 /opt/example/monitor/nrpe_plugins/*
+    find . -name "*.py" -exec chmod 755 {} \;
+    find . -name "*.sh" -exec chmod 755 {} \;
+    find . -name "*.cql" -exec chmod 750 {} \;
+    find . -name "*.odt" -exec chmod 644 {} \;
+    find . -name "*.rst" -exec chmod 644 {} \;
+    find . -name "*.org" -exec chmod 644 {} \;
+    find . -name "*.conf" -exec chmod 644 {} \;
+    find . -name "*.cfg" -exec chmod 644 {} \;
+    find . -name "*.list" -exec chmod 644 {} \;
+    find . -name "*.properties" -exec chmod 644 {} \;
+    find . -name "*.skel" -exec chmod 444 {} \;
+    find . -name "*.txt" -exec chmod 444 {} \;
+    find . -name "*README" -exec chmod 444 {} \;
+    find . -name "*.pyc" -exec rm -f {} \;
+    chmod 644 -R /opt/$branch/example/utility/customerLogCollection/
+    chmod 755 /opt/$branch/example/utility/customerLogCollection/
+    chmod 755 /opt/$branch/example/utility/customerLogCollection/collect-logs
+    logCon "  [OK] folder permissions and owners are correct "
+  else
+    error "check /opt/example for perms or owner issues "
+  fi
+}
+
+# run git stage of deb maker process - stage 1
+gitStage()          {
+    /usr/bin/git checkout $branch
+    /usr/bin/git reset --hard
+    /usr/bin/git pull origin
+    checkLast $? "Git pull failed. Aborting! "
+    rm -f /root/.count
+    /usr/bin/git log --pretty=oneline --since ${start_date[$index]} | wc -l > /root/.count
+    build=(`cat /root/.count`)
+    old_count="`cat ./example/version`"
+    if [ "$old_count" == "$branch-${build}" ] && [ -f /var/www/$sVer/archives/example_$sVer-${build}_amd64.deb  ]; then
+      logCon "  [OK] No changes since last build "
+      return 1
+    else
+      echo "$branch-${build}" > ./example/version
+      cp ./example/install/firstboot.sh              /var/www/$sVer/install/
+      cp ./example/install/README                    /var/www/$sVer/install/
+      cp ./example/install/site.properties.skel      /var/www/$sVer/install/
+      cp ./example/install/install-server.sh         /var/www/$sVer/install/
+      cp ./example/install/example-install.sh       /var/www/$sVer/install/
+      cp ./example/install/versions.txt              /var/www/$sVer/install/
+      cp ./example/install/upgrade.sh                /var/www/$sVer/install/
+      cp ./example/install/postinstall.sh            /var/www/$sVer/install/
+      cp ./example/requirements.txt                  /var/www/$sVer/install/
+      return 0
+    fi
+}
+
+# deb mkr stage2 pre sort
+debStage2()        {
+  logTee "  example-$sVer-`$count` make stage begin"
+  logTee "   start third-party make step"
+  if [ "$branch" == "develop" ] || [ "$branch" == "release-1.6.0" ]; then
+    cd /opt/$branch/third-party; make setup; make clone; make configure; make; make package
+  else
+    cd /opt/$branch/third-party; make setup; make
+  fi
+  checkLast $? "Failed make third party. Aborting! "
+  logTee "   end third-party make step"
+  logTee "    start zfs-manager make step"
+  cd /opt/$branch/example/zfs-manager; make setup; make
+  #checkLast $? "Failed make sc-zfs-man. Aborting! "
+  logTee "    end zfs-manager make step"
+  logTee "     start customerLogCollection make step"
+  rm -rf /opt/$branch/example/utility/customerLogCollection
+  cd /opt/$branch/Tools/customerLogCollection; make
+  cp -R /opt/example/utility/customerLogCollection/ /opt/$branch/example/utility/
+  # checkLast $? "Failed make customerLogCollection. Aborting! "
+  logTee "     end customerLogCollection make step"
+  cd /opt/$branch/
+}
+
+# deb mkr stage2 post sort
+debStage2Post()     {
+  rm -f /opt/example
+  ln -s /opt/$branch/example /opt/example
+  fixPerms
+  }
+
+# tar up the git branch - stage 3
+stage3()         {
+  logTee "      example-$sVer-${build} alien stage begin"
+  cd /tmp
+  tar czhfpP /tmp/example-$sVer.tgz /opt/example --owner=example --group=example \
+  --exclude='tests' --exclude='fixtures' --exclude='.DS_Store' --exclude='*.pydevproject' --exclude='*.project' \
+  --exclude=/opt/example/client_library/c_sharp --exclude=/opt/example/client_library/java_client \
+  --exclude=/opt/example/derisking --exclude=/opt/example/documentation --exclude=/opt/example/misc --exclude=/opt/example/zfs-manager
+  alien -d -k --version=$sVer"-"`$count` --description="example Software Application Development-$sVer " /tmp/example-$sVer.tgz
+  logTee "alien -d -k --version=$sVer-`$count` --description='example Software Application Development-$sVer' /tmp/example-$sVer.tgz "
+  mv /tmp/example_${sVer}-${build}-1_all.deb /opt/devel/example_${sVer}-${build}_amd64.deb
+  logTee "copied /tmp/example_${sVer}-${build}-1_all.deb /opt/devel/example_${sVer}-${build}_amd64.deb"
+  rm /var/www/${sVer}/archives/example*
+  cp /opt/devel/example_${sVer}-${build}_amd64.deb /var/www/${sVer}/archives/
+  scanDpkg /var/www/$sVer/archives/
+  logTee "       BUILD example-$sVer-${build} from git branch $branch FINISHED "
+  popd
+}
+
+# check if python is installed or not
+detectPython27()    {
+  if hash python 2>/dev/null; then
+    logCon "python detected "
+  else
+    logCon "[FATAL] Python 2.7 environment not detected - please double-check "
+  fi
+}
+
+randomTestObject()  {
+  if [ ! -d "$testObject" ]; then
+    dd if=/dev/random of=${testObject} bs=1 count=0 seek=512M || error "Failed to create a random test object -- $testObject"
+    logCon "[pre-flight] created random test object -- $testObject"
+  else
+    logCon "[pre-flight] random test object already exists -- $testObject"
+  fi
+}
+
+# put object in vaultContainer
+vaultPut()          {
+  randomTestObject
+  logCon "attempt to add the container $container"
+  curl -i -k -s -S -H "x-auth-user:admin" -H "X-Auth-Key:password" -H "x-auth-Token: $auth_key" $target -X PUT
+  logCon "verify $target exists in the container $container"
+  curl -i -k -s -S -H "x-auth-user:admin" -H "X-Auth-Key:password" -H "x-auth-Token: $auth_key" $target -X GET
+  logCon "attempt to put $testObject into the container $container"
+  curl -i -k -s -S -H "x-auth-user:admin" -H "X-Auth-Key:password" -H "x-auth-Token: $auth_key" "$target/$testObject" -X PUT -T $fName
+  logCon "verify $target/$testObject exists in the container $container"
+  curl -i -k -s -S -H "x-auth-user:admin" -H "X-Auth-Key:password" -H "x-auth-Token: $auth_key" $target/$testObject -X GET
+}
+
+# delete object in vaultContainer
+vaultDelete()       {
+  randomTestObject
+  logCon "delete $target/$testObject from the container $container"
+  curl -i -k -H "x-auth-Token: $auth_key" "$target/$testObject" -X DELETE
+  logCon "verify $target/$testObject has been removed from the container $container"
+  curl -i -k -H "x-auth-Token: $auth_key" "$target/$testObject" -X GET
+}
+
+# verify object in vaultContainer
+vaultVerify()       {
+  randomTestObject
+  logCon "verify the container $container is $target"
+  curl -i -k -s -S -H "x-auth-user:admin" -H "X-Auth-Key:password" -H "x-auth-Token: $auth_key" $target -X GET
+  logCon "verify $target/$testObject exists in the container $container"
+  curl -i -k -s -S -H "x-auth-user:admin" -H "X-Auth-Key:password" -H "x-auth-Token: $auth_key" $target/$testObject -X GET
+}

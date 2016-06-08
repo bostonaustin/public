@@ -1,0 +1,53 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# sample single node VM vagrantfile
+
+# All Vagrant configuration is done here. The most common configuration
+# options are documented and commented below. For a complete reference,
+# please see the online documentation at vagrantup.com.
+
+API_VERSION = "2"
+
+Vagrant.configure(API_VERSION) do |config|
+  config.vm.define "dev" do |dev|
+    dev.vm.box = "coreos"
+    dev.vm.hostname = "dev1"
+    dev.vm.box_url = "http://storage.core-os.net/coreos/amd64-generic/dev-channel/coreos_production_vagrant.box"
+    dev.vm.network "private_network", ip: "10.10.10.13"
+    dev.vm.provision :puppet do |puppet|
+      dev.vm.network "forwarded_port", guest: 8084, host: 4569
+        puppet.manifests_path = "/puppet/manifests"
+        puppet.module_path = "/puppet/modules"
+        puppet.manifest_file  = "dev.pp"
+    end
+  end
+
+  #config.ssh.username = "user"
+  #config.ssh.password = "password"
+  
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # If true, then any SSH connections made will enable agent forwarding.
+  # Default value: false
+  # config.ssh.forward_agent = true
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  config.vm.provider "virtualbox" do |vb|
+    # boot headless mode and save local resources
+    vb.gui = true
+  
+    # Use VBoxManage to customize the VM.
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
+  end
+end

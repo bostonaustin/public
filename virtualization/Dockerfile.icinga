@@ -1,0 +1,37 @@
+# Dockerfile for monitoring server -- icinga container
+MAINTAINER Austin Matthews <me@au5t.in>
+FROM ubuntu
+
+# set the apt repo to universe
+RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
+#add ppa for icinga-web
+RUN add-apt-repository -y "deb http://ppa.launchpad.net/formorer/icinga/ubuntu precise main"
+RUN apt-get update -y && apt-get -y install icinga icinga-idoutils icinga-web
+
+ENV PATH /usr/local/bin:$PATH
+WORKDIR /user/austin/home/docker
+
+# configuration file changes
+RUN sed 's/IDO2DB=no/IDO2DB=yes' -i /etc/default/icinga
+RUN sed 's/check_external_commands=0/check_external_commands=1' -i /etc/icinga/icinga.cfg
+RUN sed 's/process_performance_data=0/process_performance_data=1' -i /etc/icinga/icinga.cfg
+RUN sed 's/RUN="no"/RUN="yes"' -i /etc/default/npcd
+RUN echo "broker_module=/usr/lib/pnp4nagios/npcdmod.o config_file=/etc/pnp4nagios/npcd.cfg" /etc/icinga/icinga.cfg
+
+# rename sample ido utils config file
+RUN mv /etc/icinga/modules/idoutils.cfg-sample /etc/icinga/modules/idoutils.cfg
+# add www-data to the nagios group to execute commands
+RUN usermod -a -G nagios www-data
+# set group access on the command rw folder
+RUN chmod g+rwx /var/lib/icinga/rw
+
+#restart icinga
+RUN service icinga restart
+
+# web portal
+EXPOSE 80
+# admin console port
+EXPOSE 8443
+
+# execute CMD and ENTRYPOINT together
+CMD ["-pv /etc/icinga/icinga.cfg"] && ENTRYPOINT /usr/local/icinga/bin/icinga

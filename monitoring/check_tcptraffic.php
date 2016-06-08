@@ -1,0 +1,71 @@
+<?php
+# check_traffic.php PNP4nagios template
+
+$_WARNRULE = '#FFFF00';
+$_CRITRULE = '#FF0000';
+$lower = ($MAX[2] + $MAX[3]) * -1;
+$label1 = "Total - ";
+$label2 = "In    - ";
+$label3 = "Out   - ";
+
+    $ds_name[1] = "$LABEL[1] / $LABEL[2] / $LABEL[3] " ;
+    $opt[1] = "--vertical-label \"$UNIT[1]\" --title \"Traffic For $hostname / $servicedesc\" ";
+    $opt[1] .= '--color=BACK#000000 ';
+    $opt[1] .= '--color=FONT#F7F7F7 ';
+    $opt[1] .= '--color=SHADEA#ffffff ';
+    $opt[1] .= '--color=SHADEB#ffffff ';
+    $opt[1] .= '--color=CANVAS#000000 ';
+    $opt[1] .= '--color=GRID#00991A ';
+    $opt[1] .= '--color=MGRID#00991A ';
+    $opt[1] .= '--color=ARROW#00FF00 ';
+    $opt[1] .= '--slope-mode ';
+    $def[1] =  "DEF:totb=$RRDFILE[1]:$DS[1]:AVERAGE " ;
+    $def[1] .=  "DEF:inb=$RRDFILE[2]:$DS[2]:AVERAGE " ;
+    $def[1] .= "DEF:outb=$RRDFILE[3]:$DS[3]:AVERAGE " ;
+    $def[1] .= "CDEF:outbi=outb,-1,* " ;
+    $def[1] .= "CDEF:inbi=inb,-1,* " ;
+    $def[1] .= "CDEF:inoutbi=inbi,outbi,+ " ;
+    $def[1] .= rrd::gradient('totb','FF6666','B20000',$label1,20);
+    $def[1] .= "GPRINT:totb:LAST:\"%9.0lf $UNIT[1] Last \" ";
+    $def[1] .= "GPRINT:totb:MAX:\"%9.0lf $UNIT[1] Max \" ";
+    $def[1] .= "GPRINT:totb" . ':AVERAGE:"%9.0lf ' . $UNIT[1] . ' Average \j" ';
+    $def[1] .= rrd::gradient('inoutbi','f0f0f0','0000a0',$label2,20);
+    $def[1] .= "GPRINT:inb:LAST:\"%9.0lf $UNIT[2] Last \" ";
+    $def[1] .= "GPRINT:inb:MAX:\"%9.0lf $UNIT[2] Max \" ";
+    $def[1] .= "GPRINT:inb" . ':AVERAGE:"%9.0lf ' . $UNIT[2] . ' Average \j" ';
+    $def[1] .= rrd::gradient('outbi','ffff42','ee7318',$label3,20);
+    $def[1] .= "GPRINT:outb:LAST:\"%9.0lf $UNIT[3] Last \" ";
+    $def[1] .= "GPRINT:outb:MAX:\"%9.0lf $UNIT[3] Max \" ";
+    $def[1] .= "GPRINT:outb" . ':AVERAGE:"%9.0lf ' . $UNIT[3] . ' Average \j" ';
+    $def[1] .= "COMMENT:\"  \\l\" " ;
+    $def[1] .= "LINE1:0#ffffff " ;
+    $def[1] .= "HRULE:" . $WARN[1] . $_WARNRULE . ':"Throughput Warning on  ' . $WARN[1] . ' ' . $UNIT[1] . '" ' ;
+    $def[1] .= "HRULE:" . $CRIT[1] . $_CRITRULE . ':"Throughput Critical on ' . $CRIT[1] . ' ' . $UNIT[1] . '\j" ';
+
+    $ds_name[2] = "$LABEL[2] / $LABEL[3] " ;
+    $opt[2] = "--vertical-label \"$UNIT[1]\" --title \"Traffic For $hostname / $servicedesc\" ";
+    $opt[2] .= '--color=BACK#000000 ';
+    $opt[2] .= '--color=FONT#F7F7F7 ';
+    $opt[2] .= '--color=SHADEA#ffffff ';
+    $opt[2] .= '--color=SHADEB#ffffff ';
+    $opt[2] .= '--color=CANVAS#000000 ';
+    $opt[2] .= '--color=GRID#00991A ';
+    $opt[2] .= '--color=MGRID#00991A ';
+    $opt[2] .= '--color=ARROW#00FF00 ';
+    $opt[2] .= '--slope-mode ';
+    $def[2] =  "DEF:inb=$RRDFILE[2]:$DS[2]:MAX " ;
+    $def[2] .= "DEF:outb=$RRDFILE[3]:$DS[3]:MAX " ;
+    $def[2] .= "CDEF:outbi=outb,-1,* " ;
+    $def[2] .= rrd::gradient('inb','f0f0f0','0000a0',$label2,20);
+    $def[2] .= "GPRINT:inb:LAST:\"%9.0lf $UNIT[2] Last \" ";
+    $def[2] .= "GPRINT:inb:MAX:\"%9.0lf $UNIT[2] Max \" ";
+    $def[2] .= "GPRINT:inb" . ':AVERAGE:"%9.0lf ' . $UNIT[2] . ' Average \j" ';
+    $def[2] .= rrd::gradient('outbi','ffff42','ee7318',$label3,20);
+    $def[2] .= "GPRINT:outb:LAST:\"%9.0lf $UNIT[3] Last \" ";
+    $def[2] .= "GPRINT:outb:MAX:\"%9.0lf $UNIT[3] Max \" ";
+    $def[2] .= "GPRINT:outb" . ':AVERAGE:"%9.0lf ' . $UNIT[3] . ' Average \j" ';
+    $def[2] .= "COMMENT:\"  \\l\" " ;
+    $def[2] .= "LINE1:0#ffffff " ;
+    $def[2] .= "HRULE:" . $WARN[1] . $_WARNRULE . ':"Throughput Warning on  ' . $WARN[1] . ' ' . $UNIT[1] . '" ' ;
+    $def[2] .= "HRULE:" . $CRIT[1] . $_CRITRULE . ':"Throughput Critical on ' . $CRIT[1] . ' ' . $UNIT[1] . '" ';
+?>

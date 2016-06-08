@@ -1,0 +1,67 @@
+#!/bin/bash
+# @date:            11nov14
+# @author:          Austin Matthews
+# @description:     expect snippet to export SSH keys to PEER node
+#                   typically used in building a High Availability node set
+#                   also, good for creating ssh without password pairs
+
+# ssh user on remote server being granted ssh without password
+USER="root"
+# remote server, DNS name or IP, being added to local ssh authorized keys
+PEER=remote-peer
+
+# check that PEER is available to accept keys
+nmap -p22 -e eth2 $PEER |  grep 'Host is up' 1>/dev/null 2>/dev/null
+while [ ! $? -eq 0 ]; do
+  echo "The peer server is not ready. Please check SSH configuration"
+   #debug
+   #ifconfig eth2
+   #cat /etc/udev/rules.d/70-persistent-net.rules
+   #dmesg | grep eth2
+  echo "Ensure that the server/IP $PEER is ready before continuing"
+  read -n1 -rsp $'Press X key to eXit or other key to continue ... \n' key
+  if [ "$key" == "X" ] || [ "$key" == "x" ]; then
+    exit 0
+  fi
+  nmap -p22 -e eth2 $PEER |  grep 'Host is up' 1>/dev/null 2>/dev/null
+done
+
+# create a temp expect script to copy rsa public key to PEER
+cat > /tmp/scp-rsa-pub-key.exp << EOF
+#!/usr/bin/expect -f
+spawn scp /$USER/.ssh/id_rsa.pub "example@$PEER:/tmp/"
+#######################
+expect {
+  -re ".*es.*o.*" {
+    exp_send "yes\r"
+    exp_continue
+  }
+  -re ".*sword.*" {
+    exp_send "PAS!^ord\r"
+  }
+}
+interact
+EOF
+
+# make the temp expect script executable
+chmod 777 /tmp/scp-rsa-pub-key.exp
+
+# generate public key
+if [ ! -f /$USER/.ssh/id_rsa.pub ]; then
+  ssh-keygen -b 2048 -t rsa -f /$USER/.ssh/id_rsa -q -N ""
+  echo "StrictHostKeyChecking no" > /$USER/.ssh/config
+fi
+
+# send public key to peer and remove temp expect file
+/tmp/scp-rsa-pub-key.exp
+rm /tmp/scp-rsa-pub-key.exp
+
+# wait to receive peer public key and put it in authorized_keys
+while [ ! -f /tmp/id_rsa.pub ]; do
+  echo "Waiting for $PEER to send its public key"
+  sleep 10
+done
+cat /tmp/id_rsa.pub > /$USER/.ssh/authorized_keys
+rm /tmp/id_rsa.pub
+chmod 700 /$USER/.ssh/authorized_keys
+exit 0
