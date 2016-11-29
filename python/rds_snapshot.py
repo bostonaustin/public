@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # coding:utf-8
-__author__ = "Austin Matthews (boston.austin@gmail.com)"
 
-"""
+
+'''
+
 @description:
 
-Script is an automated cron job that creates a manual RDS snapshot
+Script is an automated cron job that creates an RDS snapshot
 
 Here are the steps:
         - script will need to use IAM credentials to create a manual RDS snapshot
@@ -13,13 +14,13 @@ Here are the steps:
 
 example cronjob one-liner:
 
-    $ /tools/linuxx86_64/python-3.3.6-aws/bin/python ./rds_snapshot.py -a aws-secure -i rds-zabbix-test  > ./rds_snapshot.log 2>&1
+    $ python ./rds_snapshot.py -a aws-ops -i rds-zabbix  > ./rds_snapshot.log 2>&1
 
 @requirements:
 
-    AWS IAM keyfile -- /awsoperations/users/{your username}/aws/{AWS account keyfile}
+    AWS IAM keyfile -- /Users/{your username}/aws/{AWS account keyfile}
 
-"""
+'''
 
 
 from boto3.session import Session
@@ -32,7 +33,7 @@ import os
 LOG_LEVEL = 2
 NOW = datetime.now()
 CONFIG_DATA = dict()
-AWS_CRED_PATH = '/awsoperations/users/'
+AWS_CRED_PATH = '/Users/'
 AWS_REGION = 'us-east-1'
 AWS_USER_ACCT = os.getlogin()
 

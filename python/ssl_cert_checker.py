@@ -13,10 +13,8 @@ from email.mime.text import MIMEText
 from argparse import RawTextHelpFormatter
 
 
-__author__ = 'Austin Matthews (boston.austin@gmail.com)'
-
-
 """
+
     a cron job that loops through the sites to check the SSL certificate expiration date(s)'
 
     works on python v2.6
@@ -27,7 +25,8 @@ __author__ = 'Austin Matthews (boston.austin@gmail.com)'
                                 website_b:443
                                 website_c:443
 
-    example -- $ python ./ssl_cert_checker.py -c .ssl_cert_checker.list -a 28 -m boston.austin@gmail.com
+    example -- $ python ./ssl_cert_checker.py -c .ssl_cert_checker.list -a 28 -m mail@mail.com
+
 """
 
 
