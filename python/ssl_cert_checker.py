@@ -1,5 +1,17 @@
 #!/usr/bin/env python
-# coding:utf-8
+"""
+a cron job that loops through the sites to check the SSL certificate expiration date(s)'
+
+works on python v2.6
+
+requires -- .ssl_cert_checker.list or any file as input with one host per line, format <host>:<port>'
+
+    .ssl_cert_checker.list :    website_a:443
+                                website_b:443
+                                website_c:443
+
+example -- $ python ./ssl_cert_checker.py -c .ssl_cert_checker.list -a 28 -m mail@mail.com
+"""
 
 
 import sys
@@ -11,23 +23,6 @@ import datetime
 from OpenSSL import SSL
 from email.mime.text import MIMEText
 from argparse import RawTextHelpFormatter
-
-
-"""
-
-    a cron job that loops through the sites to check the SSL certificate expiration date(s)'
-
-    works on python v2.6
-
-    requires -- .ssl_cert_checker.list or any file as input with one host per line, format <host>:<port>'
-
-    .ssl_cert_checker.list :    website_a:443
-                                website_b:443
-                                website_c:443
-
-    example -- $ python ./ssl_cert_checker.py -c .ssl_cert_checker.list -a 28 -m mail@mail.com
-
-"""
 
 
 def log(message, severity):
@@ -79,9 +74,7 @@ def cert_checker(p1, p2, p3):
                     email_info += 1
                 else:
                     response += "[OK] {0}:{1} does not expire for {2} days. (expires {3})\n".format(host, port, days_to_expire, exp_date)
-                    # use above to print out the expiration date - below is the original method
-                    #response += "[OK] {0}:{1} does not expire for {2} days.\n".format(host, port, days_to_expire)
-
+                    
                     cert_valid += 1
             except Exception as e:
                 response += "\n[ERROR] {0} -- while testing {1}:{2}.\n".format(e, host, port)
@@ -115,7 +108,7 @@ def cert_checker(p1, p2, p3):
 
 def main():
     """ check the url(s) for valid SSL certificates and alert if expiring """
-    config_file = '/awsoperations/tools/common/.ssl_cert_checker.list'
+    config_file = '/aws/tools/.ssl_cert_checker.list'
     mail_rcpt = '<boston.austin@gmail.com>`'
     alert_days = 28
     parser = argparse.ArgumentParser(description='Check SSL certificate expiration date(s) for website(s)',
@@ -149,7 +142,8 @@ def main():
         log("[ERROR] process failed to complete properly -- please try again".format(__file__), 0)
         sys.exit(1)
 
-
+        
+# only run as a stand-alone script
 if __name__ == '__main__':
     try:
         main()
