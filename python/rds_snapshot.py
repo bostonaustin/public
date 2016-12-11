@@ -1,25 +1,13 @@
 #!/usr/bin/env python
-# coding:utf-8
+''' 
+description:  creates an RDS snapshot
 
-
-'''
-
-@description:
-
-Script is an automated cron job that creates an RDS snapshot
-
-Here are the steps:
-        - script will need to use IAM credentials to create a manual RDS snapshot
-        - include aws-secure account in RDS clean-ups
-
-example cronjob one-liner:
-
+usage:
     $ python ./rds_snapshot.py -a aws-ops -i rds-zabbix  > ./rds_snapshot.log 2>&1
 
-@requirements:
-
-    AWS IAM keyfile -- /Users/{your username}/aws/{AWS account keyfile}
-
+requirements:
+    - AWS IAM keyfile -- /Users/{your username}/aws/{AWS account keyfile}
+    - script will need to use IAM credentials to create a manual RDS snapshot
 '''
 
 
@@ -78,10 +66,9 @@ def create_rds_snapshot(p_aws_session, p_instance_name):
     response = rds.create_db_snapshot(
         DBSnapshotIdentifier = SNAPSHOT_ID,
         DBInstanceIdentifier = INSTANCE_NAME,
-        # add custom tags to db-snapshot here:
         # Tags=[
         #     {
-        #     'Snapshot type': 'manual',
+        #     'Snapshot type': 'cron generated',
         #     },
         # ]
         )
@@ -94,7 +81,7 @@ def create_rds_snapshot(p_aws_session, p_instance_name):
 def main():
     """ create a manual rds DB snapshot backup """
     parser = argparse.ArgumentParser(description='Create a manual RDS snapshot', usage='%(prog)s')
-    parser.add_argument('-a', dest='product_line', help='AWS Product Line or Account Name [i.e. aws-secure | aws-blackops] ')
+    parser.add_argument('-a', dest='product_line', help='AWS Product Line or Account Name [i.e. prod | stage] ')
     parser.add_argument('-i', dest='instance_name', help='AWS Instance/Cluster Name')
     args=parser.parse_args()
 
