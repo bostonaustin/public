@@ -1,9 +1,9 @@
 # @description:   puppet module for setting apt sources to example location
 # @author:        Austin Matthews
 
-$apt_mod = "/opt/example/puppet/modules/apt/files"
 
 class { 'apt': }
+
 
 class apt {
   notify { "OK - apt":
@@ -18,14 +18,16 @@ class apt {
   Class['apt::config'] -> Class['apt::install']
 }
 
+
 class apt::config {
-  $mod_home = "/opt/example/puppet/modules/apt/files"
+  $apt_mod = "/opt/example/puppet/modules/apt/files"
 
   file { "/etc/apt/sources.list":
     ensure => present,
     source => "${apt_mod}/sources.list",
   }
 }
+
 
 class apt::install {
   package { "apt": ensure => present, }
