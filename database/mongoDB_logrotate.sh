@@ -1,5 +1,7 @@
 #!/bin/bash
+# setup and configure logrotate for mongo DB
 
+# log location (change as necessary)
 mongodb_log="/etc/logrotate.d/mongodb"
 
 # ensure logrotate is installed on server
