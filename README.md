@@ -1,4 +1,5 @@
-## code samples of bash shell and python syntax 
+code samples of bash shell and python 
+-------------------------------------
 
 [ansible](https://github.com/bostonaustin/public/blob/master/ansible/)
 - playbooks to setup a webserver running petclinic with Maven, NGINX and Spring
@@ -23,13 +24,13 @@
 
 [utility bin](https://github.com/bostonaustin/public/blob/master/utility%20bin/)
 - [database](https://github.com/bostonaustin/public/blob/master/database/)
--- verify a cassandra keyspace user
--- archive a keyspace 
--- backup a mysql database
+ verify a cassandra keyspace user
+ archive a keyspace 
+ backup a mysql database
 - [monitoring](https://github.com/bostonaustin/public/tree/master/monitoring)
---- perl scripts for nagios service checks
---- PHP based PHP4nagios graph templates 
---- NRPE client configuration file
+  perl scripts for nagios service checks
+  PHP based PHP4nagios graph templates 
+  NRPE client configuration file
 - binaries for everyday usage and troubleshooting purposes
 - bin folder for DevOps automation tasks (ssh-no-password, raid, rsync, sed/awk)
 - configure software packages 
