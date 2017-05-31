@@ -1,3 +1,3 @@
-[puppet - Ruby](https://github.com/bostonaustin/public/tree/master/puppet/ssh_module.pp)
-- modules for installing 3rd party software repos
+[puppet examples - Ruby]
+- modules for using a custom 3rd party software repo
 - adding ssh w/o passwords and updating python modules

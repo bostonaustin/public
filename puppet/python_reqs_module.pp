@@ -1,6 +1,6 @@
-# @description:   puppet module for loading custom set of Python modules using pip
-#                 comment-out content line and enable source to use remote file settings
-# @author:        Austin Matthews
+# @description:   example of creating a file using static content vs. an input file
+#				  puppet module for loading custom set of Python modules using pip
+#                 switch content and source lines to use remote file settings
 
 class pip_reqs {
 
