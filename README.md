@@ -1,7 +1,7 @@
 ## code samples of bash shell and python syntax 
 
 [ansible](https://github.com/bostonaustin/public/blob/master/ansible/)
-- playbooks to setup a webserver with Maven, NGINX and Spring
+- playbooks to setup a webserver running petclinic with Maven, NGINX and Spring
 
 [bootstrap](https://github.com/bostonaustin/public/blob/master/bootstrap/)
 - AWS user_data for a replace-able WordPress blog with S3 sync
@@ -22,15 +22,15 @@
 - POST/DELETE/ 1MB objects via REST API
 
 [utility bin](https://github.com/bostonaustin/public/blob/master/utility%20bin/)
+- [database](https://github.com/bostonaustin/public/blob/master/database/)
+-- verify a cassandra keyspace user
+-- archive a keyspace 
+-- backup a mysql database
+- [monitoring](https://github.com/bostonaustin/public/tree/master/monitoring)
+--- perl scripts for nagios service checks
+--- PHP based PHP4nagios graph templates 
+--- NRPE client configuration file
 - binaries for everyday usage and troubleshooting purposes
 - bin folder for DevOps automation tasks (ssh-no-password, raid, rsync, sed/awk)
 - configure software packages 
 - backup network devices
--- [database](https://github.com/bostonaustin/public/blob/master/database/)
---- verify a cassandra keyspace user
---- archive a keyspace 
---- backup a mysql database
--- [monitoring](https://github.com/bostonaustin/public/tree/master/monitoring)
---- perl scripts for nagios service checks
---- PHP based PHP4nagios graph templates 
---- NRPE client configuration file
