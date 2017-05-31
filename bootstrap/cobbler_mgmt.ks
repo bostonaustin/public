@@ -1,8 +1,5 @@
 # cobbler kickstart template in /var/lib/cobbler/kickstarts/example-mgmt
-#
 # install + configure a new management server with icinga + logstash + cobbler + puppet
-#
-# @author:  Austin Matthews
 
 # first call the 'example-base' set of packages for all server types
 d-i debian-installer/locale string en_US.UTF-8
@@ -10,6 +7,7 @@ d-i debian-installer/splash boolean false
 d-i console-setup/ask_detect        boolean false
 d-i console-setup/layoutcode        string us
 d-i console-setup/variantcode       string
+
 # known bug - being ignored here, handle at kopts level on profile or system
 #d-i netcfg/choose_interface select eth0
 d-i netcfg/get_nameservers  string
@@ -68,6 +66,7 @@ d-i partman-md/device_remove_md boolean true
 d-i partman-md/confirm boolean true
 d-i partman-md/confirm_write_new_label boolean true
 d-i partman-md/choose_partition select Finish partitioning and write changes to disk
+
 # write the changes to the storage devices and configure RAID?
 d-i	partman-md/confirm_nooverwrite	boolean	true
 d-i partman-md/confirm boolean true
