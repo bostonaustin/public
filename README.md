@@ -1,12 +1,13 @@
 code samples and reference materials
 ------------------------------------
+
    [ansible](https://github.com/bostonaustin/public/blob/master/ansible/)
-   * playbooks to setup a webserver running petclinic with Maven, NGINX and Spring
+   * playbooks for a webserver running petclinic with Maven, NGINX and Spring
+   *
 
    [bootstrap](https://github.com/bostonaustin/public/blob/master/bootstrap/)
    * AWS user_data for a replace-able WordPress blog with S3 sync
-   * AWS CloudFormation template from Designer for a self-healing, multi-AZ WP Blog
-   * cobbler kickstart file for ubuntu to configure S/W raid mirror sda+sdb
+   * AWS CloudFormation template for a self-healing, multi-AZ WP Blog
    * postinstall + firstboot init.d scripts to run commands w/o using user_data
 
    [puppet](https://github.com/bostonaustin/public/tree/master/puppet)
@@ -14,14 +15,15 @@ code samples and reference materials
    * module to add ssh w/o passwords and updating python modules
 
    [python](https://github.com/bostonaustin/public/tree/master/python)
-   * the last production script I worked on -- checking SSL expiration dates
-   * python versions of tic-tac-toe, blackjack and geek translator dictionary
+   * last production script I wrote -- checking SSL expiration dates
+   * second to last production script -- creates an AWS RDS snapshot
+   * reference syntax basics with tic-tac-toe, blackjack and geek translator dictionary
 
    [utility_bin](https://github.com/bostonaustin/public/blob/master/utility_bin/)
    * binaries for everyday usage, automating jobs and troubleshooting purposes
    * includes DevOps automation tasks (ssh-no-password, raid, rsync, sed/awk)
 
-       `Miscellaneous folders`
+       `utility bin folders`
 
        [database](https://github.com/bostonaustin/public/blob/master/utility_bin/_database/)
        ~~~

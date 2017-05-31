@@ -1,19 +1,13 @@
 #! /bin/bash
-# @date:            24dec14
-# @version:         1.5.1
-# @name:            backup_es_index
-# @description:     Rotate and archive Elasticsearch index and cron should run at midnight daily
-# 					Maintains only 8 indicies (1 week) of logstash logs
-# 					Removes the oldest one (as well as any 1970s-era log indices, as these are a product of timestamp fail).
-# 					ES would rather delete everything than nothing...
-# @indices location:
+# Rotate and archive Elasticsearch index and cron should run at midnight daily
+# Maintains only 8 indicies (1 week) of logstash logs
+# Removes the oldest one (as well as any 1970s-era log indices, as these are a product of timestamp fail).
+# ES would rather delete everything than nothing...
+# indices location:
 # 					/var/lib/elasticsearch/<server-vip>/nodes/0/indices
 # 					/data/elasticsearch/<server-vip>/nodes/0/indices
-# @retention:       Save the index for 30 days
-# @debug mode:		change to 'set -x -v' for debug
-#set -x
+# retention:       Save the index for 30 days
 
-# @variable
 SITE_PREFIX=(`grep -m 1 "SITE_PREFIX" /opt/example/conf/host.properties  | awk -F "=" '{print $2}' `)
 SERVER_VIPNAME=(`grep ${SITE_PREFIX}MGMT_VIPNAME /opt/example/conf/site.properties | grep -v '^#' | awk -F "=" '{print $2}'`)
 TODAY=`date +"%Y.%m.%d"`
@@ -22,7 +16,8 @@ INDEXDIR="/data/elasticsearch/$SERVER_VIPNAME/nodes/0/indices"
 BACKUPDIR="/data/elasticsearch/backups"
 logFile=/var/log/backup_es_index${TODAY}.log
 
-timeStamp() {
+timeStamp() 
+{
   date +"%Y-%m-%d %H:%M:%S,%3N"
 }
 
@@ -105,4 +100,4 @@ rm /tmp/mappost
 rm /tmp/mapping
 find /var/log/elasticsearch/ -mtime +90 -exec rm {} \;
 find /data/elasticsearch/backups -mtime +30 -exec rm {} \;
-exit 0
+exit

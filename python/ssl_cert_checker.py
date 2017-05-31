@@ -1,17 +1,18 @@
 #!/usr/bin/env python
-"""
-a cron job that loops through the sites to check the SSL certificate expiration date(s)'
 
-works on python v2.6
+'''
+Usage: $ python ./ssl_cert_checker.py -c .ssl_cert_checker.list -a 28 -m mail@mail.com
 
-requires -- .ssl_cert_checker.list or any file as input with one host per line, format <host>:<port>'
+loops through websites to report the SSL certificate expiration dates of multiple sites
+
+changes email subject header when sites expire within a number of days (28 by default)
+
+requires config file -- format <host>:<port>
 
     .ssl_cert_checker.list :    website_a:443
                                 website_b:443
                                 website_c:443
-
-example -- $ python ./ssl_cert_checker.py -c .ssl_cert_checker.list -a 28 -m mail@mail.com
-"""
+'''
 
 
 import sys
@@ -26,7 +27,7 @@ from argparse import RawTextHelpFormatter
 
 
 def log(message, severity):
-    """ print to STDOUT with custom timestamp - use $ ssl_cert_checker.py > to save to a logfile """
+    ''' print to STDOUT with custom timestamp - use $ ssl_cert_checker.py > to save to a logfile '''
     current_time = datetime.datetime.today().strftime('%Y-%m-%d.%H:%M:%S')
     log_level = 1                                                           # set to 0 = normal / 1 = debug
     if log_level >= severity:                                               # set log severity 0 = normal [OR] 1 = debug
@@ -34,7 +35,7 @@ def log(message, severity):
 
 
 def cert_checker(p1, p2, p3):
-    """ check for a response from servers being verified """
+    ''' check for a response from servers being verified '''
     config_file = p1
     alert_days = int(p2)
     mail_rcpt = p3
@@ -51,7 +52,7 @@ def cert_checker(p1, p2, p3):
     email_error = 0
 
     for line in servers:
-        """ loop over list of ssl certs to check """
+        ''' loop over list of ssl certs to check '''
         host = line.strip().split(':')[0]
         port = line.strip().split(':')[1]
         try:
@@ -107,7 +108,7 @@ def cert_checker(p1, p2, p3):
 
 
 def main():
-    """ check the url(s) for valid SSL certificates and alert if expiring """
+    ''' check the url(s) for valid SSL certificates and alert if expiring '''
     config_file = '/aws/tools/.ssl_cert_checker.list'
     mail_rcpt = '<boston.austin@gmail.com>`'
     alert_days = 28
