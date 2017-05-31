@@ -18,19 +18,21 @@ code samples of bash shell and python
 - Production python scripts that 
 - python versions of tic-tac-toe, blackjack and geek translator dictionary
 
-[tests](https://github.com/bostonaustin/public/tree/master/tests)
-- jenkins build post-commit test  
-- POST/DELETE/ 1MB objects via REST API
-
-[utility bin](https://github.com/bostonaustin/public/blob/master/utility%20bin/)
-- [database](https://github.com/bostonaustin/public/blob/master/database/)
- verify a cassandra keyspace user
- archive a keyspace 
- backup a mysql database
-- [monitoring](https://github.com/bostonaustin/public/tree/master/monitoring)
-  perl scripts for nagios service checks
-  PHP based PHP4nagios graph templates 
-  NRPE client configuration file
+[utility_bin](https://github.com/bostonaustin/public/blob/master/utility_bin/) 
+- [database](https://github.com/bostonaustin/public/blob/master/utility_bin/_database/)
+ * verify a cassandra keyspace user
+ * archive a keyspace 
+ * backup a mysql database
+- [monitoring](https://github.com/bostonaustin/public/tree/master/utility_bin/_monitoring)
+ * perl scripts for nagios service checks
+ * PHP based PHP4nagios graph templates 
+ * NRPE client configuration file
+- [tests](https://github.com/bostonaustin/public/tree/master/utility_bin/_tests)
+ * jenkins build post-commit test  
+ * POST/DELETE/ 1MB objects via REST API
+- [virtualization](https://github.com/bostonaustin/public/tree/master/utility_bin/_virtualization)
+ * Dockerfile sample from an icinga container
+ * Vagrantfile for a 4-node VM cluster
 - binaries for everyday usage and troubleshooting purposes
 - bin folder for DevOps automation tasks (ssh-no-password, raid, rsync, sed/awk)
 - configure software packages 

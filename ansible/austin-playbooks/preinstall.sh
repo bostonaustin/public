@@ -1,19 +1,18 @@
 #!/bin/bash
+# ensure your local Ansible Control Station is ready to run playbooks
 
-# Description: Run this script to ensure your local Ansible Control Station is ready
-#
-# To reset and re-run this script from scratch to reset all settings:
+# Hard-codes to an AWS account with static ssh keys, AWS access / secret keys and ENV PATH(s)
+
+# Reset and re-run this script from scratch:
 #     a. # rm ~/.preinstall_has_run_breadcrumb
 #     b. re-run ./preinstall.sh
 
-# variables
 AWS_CONFIG=~/.aws/config
 SSH_ENV=$HOME/.ssh/environment
 AWS_KEY=/root/.ssh/kp_se_eval.pem
 VAGRANT_KEY=/media/psf/Home/Dropbox/austin-playbooks/install-app-host/vagrant/files/ubuntu_vagrant
 
-# functions
-checkDir()         {
+check_directory()         {
   if [ ! -d "$1" ]; then
     echo "[pre-flight] creating directory $1"; mkdir -p "$1" || echo "Failed to create directory $1"
   else
@@ -29,51 +28,43 @@ else
 fi
 
 # add the PPA for the latest version of ansible locally on the control station
+apt_packages="ansible aptitude software-properties-common python-setuptools python-dev g++ python2.7-dev sshpass autoconf python-pip libssl-dev libffi-dev build-essentials"
+pip_list="ansible boto Jinja six PyYAML httplib2 paramiko"
 if [ ! -f ~/.preinstall_has_run_breadcrumb ]; then
   apt-add-repository -y ppa:ansible/ansible
   apt-get -y update
-  apt-get -y install ansible
-  apt-get -y install aptitude
-  apt-get -y install software-properties-common
-  apt-get -y install python-setuptools
-  apt-get -y install python-dev
-  apt-get -y install g++
-  apt-get -y install python2.7-dev
-  apt-get -y install sshpass
-  apt-get -y install autoconf
-  apt-get -y install python-pip
-  apt-get -y install libssl-dev
-  apt-get -y install libffi-dev
-  apt-get -y install build-essentials
+  for apt_package in $apt_packages
+  do
+    echo "checking for latest software update of ${apt_package}"
+    apt-get -y install ${apt_package}
+  done
   apt-get autoremove
-  pip install ansible
-  pip install boto
-  pip install Jinja
-  pip install six
-  pip install PyYAML
-  pip install httplib2
-  pip install paramiko
+  for module in $pip_list
+  do
+    echo "checking for latest pyhton pip of ${pip_module}"
+    pip install ${pip_module}
+  done
 fi
-echo "[pre-flight] apt-get updates ran successfully"
+echo "[pre-flight] apt-get updates and pip installs ran successfully"
 
-# check if AWS CLI is install already
+# check if AWS CLI is installed
 command -v aws >/dev/null 2>&1 || { echo >&2 "[WARN] AWS CLI not installed - attempting to install via apt-get."; apt-get -y install awscli; }
 command -v aws >/dev/null 2>&1 || { echo >&2 "[ERROR] AWS CLI package not installed, please correct and re-try."; exit 1; }
 echo "[pre-flight] AWS CLI installed properly"
 
-# check if Ansible is install already
+# check if Ansible is installed
 command -v ansible >/dev/null 2>&1 || { echo >&2 "[WARN] AWS CLI not installed - attempting to install via apt-get."; apt-get -y install ansible; }
 command -v ansible >/dev/null 2>&1 || { echo >&2 "[ERROR] AWS CLI package not installed, please correct and re-try."; exit 1; }
 echo "[pre-flight] Ansible installed properly"
 
-# check if python3 is install already
+# check if python3 is installed
 command -v python3 --version >/dev/null 2>&1 || { echo >&2 "[WARN] python3 not installed - attempting to install via apt-get."; apt-get -y install python3; }
 command -v python3 --version >/dev/null 2>&1 || { echo >&2 "[ERROR] python3 package not installed, please correct and re-try."; exit 1; }
 echo "[pre-flight] python3 installed properly"
 
 # add .pem key to ssh-agent
 echo "[pre-flight] checking SSH remote key is imported to ssh-agent ..."
-checkDir ~/.ssh
+check_directory ~/.ssh
 if [ ! -f ${AWS_KEY} ]; then
   echo "[ERROR] SSH remote host key missing, double-check ~/.ssh/ for *.pem file"; exit 1
 else
@@ -111,7 +102,7 @@ fi
 
 # check for AWS keys in env
 echo "[pre-flight] checking for AWS config file ..."
-checkDir ~/.aws
+check_directory ~/.aws
 
 if [ ! -f ${AWS_CONFIG} ]; then
   # TODO -- REMOVE after testing for security
@@ -119,8 +110,8 @@ cat > ${AWS_CONFIG} <<EOC
 [default]
 output = text
 region = us-east-1
-aws_access_key_id = AKIAJOXCC7VEW5D7HWXQ
-aws_secret_access_key = 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
+aws_access_key_id = AblahKblahIblahDblah7HWXQ
+aws_secret_access_key = hblahMjblahqblahdi5w8G4jyQpxEsJ6t3lVP5sM
 EOC
   chmod 600 ${AWS_CONFIG}
   if [[ ${ANSIBLE_HOSTS} == "" ]]; then
@@ -206,4 +197,4 @@ touch ~/.preinstall_has_run_breadcrumb
 echo " "
 echo "[pre-flight] preinstall script completed successfully"
 echo " "
-exit 2
+exit
