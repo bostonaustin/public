@@ -1,7 +1,7 @@
 #!/bin/bash
-# test script used by Jenkins for automated virtual environments
+# run jenkins post-build tests and generate reports
 
-# setup vitural env if available -- else setup local PYTHONPATH to WORKSPACE
+# setup vitural env if available or setup local PYTHONPATH to WORKSPACE
 export PATH=$PATH:/usr/local/bin:/usr/local/share/python
 cd $WORKSPACE
 if hash virtualenv 2>/dev/null; then
@@ -49,7 +49,7 @@ rm `find . -name *.pyc`
 
 # drop the keyspace
 python cassandra/create_keyspace.py delete ${KEYSPACE}_test -s $SERVER
-echo "run tests for $PROJECTS"
+echo "running tests for $PROJECTS ..."
 for project in $PROJECTS
 do
   project=${project%/}
@@ -65,11 +65,11 @@ do
   fi
 done
 
-echo "creating coverage reports"
+echo "creating coverage reports ..."
 coverage xml --include=example/* -o $OUTPUT_FOLDER/coverage.xml
 coverage html --include=example/* -d $OUTPUT_FOLDER/coverage
 
-echo "Running js tests!"
+echo "running phantom js tests ..."
 cd $WORKSPACE/operator_console/web-content/public/js/tests
 `which phantomjs` js/qunit-runner.js test.html --xunitOnly > $OUTPUT_FOLDER/jstests.xml
 set -e

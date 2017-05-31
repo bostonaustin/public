@@ -1,8 +1,10 @@
 #! /bin/bash
-# @date:            22apr15
-# @author:          Austin Matthews
-# @description:     create the example-install.iso
-# @requirments:     ubuntu 12.04.1 image in local /opt/downloads
+
+# perfect example of over-encapsulation
+
+# generates a botable ubuntu 12.04 ISO image 
+
+# requires:  standard ubuntu 12.04.1 image in local /opt/downloads
 
 basedir="/opt/iso_images/"
 downloads="/opt/downloads"
