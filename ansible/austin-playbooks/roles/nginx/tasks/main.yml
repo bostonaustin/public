@@ -1,0 +1,64 @@
+---
+
+  - name: NGINX | Configure NGINX
+    hosts: webservers
+    vars:
+      - server_port: 8080
+    become: true
+
+    tasks:
+      - name: NGINX | ensure nginx application is installed and enabled to start at boot
+        apt: name=nginx state=present
+
+      - name: NGINX | add /etc/nginx/html directory
+        file: path=/etc/nginx/html state=directory
+
+      - name: NGINX | copy index.html
+        template: src=index.html.j2 dest=/usr/share/nginx/html/index.html
+          mode=0644
+        notify:
+          - NGINX | restart nginx
+
+      - name: NGINX | generate the nginx config file
+        template: src=nginx.conf dest=/etc/nginx/sites-available/default
+
+      - name: NGINX | enable default configuration in sites-available
+        file: >
+          dest=/etc/nginx/sites-enabled/default
+          src=/etc/nginx/sites-available/default
+          state=link
+        notify:
+          - NGINX | restart nginx
+
+      - name: NGINX | verify nginx is running and enabled at boot
+        service: name=nginx state=started enabled=yes
+
+      - name: NGINX | Adding NGINX signing key
+        apt_key: url=http://nginx.org/keys/nginx_signing.key state=present
+
+      - name: NGINX | Adding sources.list deb url for NGINX
+        lineinfile: dest=/etc/apt/sources.list line="deb http://nginx.org/packages/mainline/ubuntu/ trusty nginx"
+
+      - name: NGINX Plus | Adding sources.list deb-src url for NGINX
+        lineinfile: dest=/etc/apt/sources.list line="deb-src http://nginx.org/packages/mainline/ubuntu/ trusty nginx"
+
+      - name: NGINX | Updating apt cache
+        apt:
+          update_cache: yes
+          cache_valid_time: 7200
+        notify:
+          - restart nginx
+
+      - name: NGINX | Installing NGINX
+        apt:
+          pkg: nginx
+          state: present
+
+      - name: NGINX | Starting NGINX
+        service:
+          name: nginx
+          state: started
+
+    handlers:
+      - name: NGINX | restart nginx
+        service: name=nginx state=restarted

@@ -1,0 +1,9 @@
+[local]
+localhost ansible_ssh_host=127.0.0.1 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa
+
+#[vagrants]
+#testserver ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/media/psf/Home/Dropbox/austin-playbooks/vagrant/files/ubuntu_vagrant
+
+[webservers]
+vagrant ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/media/psf/Home/Dropbox/austin-playbooks/vagrant/files/ubuntu_vagrant
+54.242.89.36 ansible_ssh_host=54.242.89.36 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/root/.ssh/kp_se_eval.pem

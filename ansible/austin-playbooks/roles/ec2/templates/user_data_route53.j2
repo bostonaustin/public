@@ -1,0 +1,88 @@
+--
+
+ - # setup ansible user
+   users:
+    - name: "{{ remote_user }}"
+      ssh-authorized-keys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCkd3d+61s2nLR/RwlpV4yb78l9L2ZxVEelN1kSF7Rr4uee/3xgttCYlseW3JRwor8YTkHnzUDXBjakD/HTKblA2y0kw5CEoocwQf0CTvuR4t+CMTgBwSGE6PAuN8BNVn5w3FYFO3F2yLRBSksn/RRMctwUO+S5FOKHPD3yJsxbUXgVH/oKK8dIw36xNg7j65ywYW6fqNMdH7HrQAfJ5Ie5PuaicItGoU05t1/FGbOfOSBn8zysr7thB7TSeSPaN3PU6b17I4Bdca0D9366W+qukriz5MvaEV8QXm3DZVQRrHn/m/tesc3MlDIZvL9xHPtHBS/zrCdYiRHa275zSBOn root@ubuntu
+      ssh_keys:
+        rsa_private: |
+           -----BEGIN RSA PRIVATE KEY-----
+           MIIEogIBAAKCAQEAicZeZS2U9s2V1GgAeNWo4IlAetj/NPZiMGfcA4zIc/GUEkKjXGeNAccAElIA
+           AUMXepPSmUZhjUI8+hH6LwTcXqKu7Qzh/MN/dEvKm2HtPzbLxgN9LwjgYjL64hlg2Ir0cguRuD0O
+           VtXmok+ftVVVXZnZI3EUozFl6KK0PF1vFgeC+Yoy1SI9Vz7lAKmI+6u0uU3Qlx2RbMc0u0xC4CJp
+           UDUPBNW2xwxJe0jrT21lECLkZ1fAKlGt+F87w9CNEf1TF3cIbFgGPZJEEms7GEVYRN3vWS7ehUO5
+           XQcMdteSMXpFfmMiLBVfTQlR201nSEVOmH7GjV9oqBUq6q5ujEfstwIDAQABAoIBAFxge05Pv7+z
+           nLBsg1SBvde/b1JvSL6ULMXT/XsL3CORaPzNXYdJjwwQCAZAoOw3tfhkQSKwRBxYu1XY0+zOz4tM
+           fQlISAYYds7dOp3wjQiDjyHXmQn+Y6S0Fe+foIXQtZH6G9xyY7jpdtiBls4Yx0IZM7RFz9aT+oZ/
+           AWYwJ5mWt78lQ2ch2zNCB143OaG7PnSRqLC4NdYIWe8YVWDYsV7C9cFgt1U2TkydFujSEYbMs5Ji
+           bFGSRQVPyqsad21H/5d+smqr7tB7Usry68OBdnVNkykpSjYE0bDBIkvAVfz4Tt0idmC4rIP/7n1A
+           ryCu9kr7IxtF+TO3f/HGNbh6kMECgYEAwvgm93ABqlCjkXoxNtmvTXGm8/87JzweVzNZW0TihVxl
+           ZoTHbZXw0oc49amWn3QPL+L+ApAM2AWZhH+t03HjmWnvr9B33TGaJu6rhI7QF/ebc4WreCNzzGd8
+           3XEkHt3/qhdaY/kfOvU8ZcfaAQrIWE4T70XEZP/68l/psV8l4rECgYEAtObxqNNhUi1vTWsYvh2H
+           pu8w9lRqbBCI5KpF9Jdbg/IDzuz2Mpl8SxdHBEhr4IIphtMC6Gw3xUzqvsPAFxXYMOC/fBGaQ8AF
+           wCVJ4ADAuzMf7AcspRWCvw3IPwzFF7xmpgsy/rUvyZhuEwVScjLTh1fj2u+a/PtlgS7h0xnQD+cC
+           gYBZPVYwmX7ZovFLTB+smHTJwMSHGALOUZEdnq4+vUflfMYY55uUiDXjVut2XjpIH8o3w/E54Q9P
+           7Tg4UmyQxKdFeByyX3wNrX9+ZG3zTZ7n6Xiopr02TxvYqmGXxgqfakN0ah4Adm2aAde0SoZ5RaMv
+           8ATl1wwuopANUmNXwVJI8QKBgGFluhSwgkRxa+ydzbuGQKPzQkRN3OKD4IBk4Lc4yq/2nHBLip5h
+           ntb7GGRI7bP5wIvzjiw/H6PdrsG4uPJ082oVh2MwQwNZHn9+VBEDtsDTXMuCbVoQg82DiR3RLUiD
+           Siz5+KHEQY9jv1gEVIhhrxu+iVI2ERdF7zenWzSCQFBfAoGASyc6pSopUwEPO7bcBpWjlkTRsvw7
+           kGuqQLGMVWJHBQ1oYbazgsPcVnJMkMFvUUxq41ZjrQoOA5TTeKlNTCyGb2eClVeTc0pr0K8SD4re
+           YuQ+qe8ZhK26jIMrmDl7rZdGV8bNU+QFKC9MXB8oxJd9t98cMZMm6VxZQ/QEkx49/NE=
+           -----END RSA PRIVATE KEY-----
+
+      groups: [ 'admin', 'adm', 'dialout', 'sudo', 'lxd', 'plugdev', 'netdev' ]
+      shell: /bin/bash
+      sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+
+      # Set the hostname + FQDN, then add to local /etc/host
+      hostname: "{{ item.hostname }}"
+      fqdn: "{{ item.fqdn }}"
+      manage_etc_hosts: true
+      timezone: US/Eastern
+      package_update: true
+      package_upgrade: true
+
+      packages:
+        - awscli
+        - python
+        - aptitude
+
+      # script that executes on every boot and sets a DNS entry
+      # requires the instance having an appropriate IAM role set,
+      # so it has permission to perform the changes to Route53
+      write_files:
+        - content: |
+          #!/bin/sh
+          FQDN=`hostname -f`
+          ZONE_ID=""
+          TTL=300
+          SELF_META_URL="http://169.254.169.254/latest/meta-data"
+          PUBLIC_DNS=$(curl ${SELF_META_URL}/public-hostname 2>/dev/null)
+
+          cat << EOT > /tmp/aws_r53_batch.json
+          {
+          "Comment": "Assign AWS Public DNS as a CNAME of hostname",
+          "Changes": [
+            {
+            "Action": "UPSERT",
+            "ResourceRecordSet":
+              {
+              "Name": "${FQDN}.",
+              "Type": "CNAME",
+              "TTL": ${TTL},
+              "ResourceRecords": [
+                {
+                "Value": "${PUBLIC_DNS}"
+                }
+              ]
+              }
+            }
+            ]
+          }
+          EOT
+
+          aws route53 change-resource-record-sets --hosted-zone-id ${ZONE_ID} --change-batch file:///tmp/aws_r53_batch.json
+          rm -f /tmp/aws_r53_batch.json
+          path: /var/lib/cloud/scripts/per-boot/set_route53_dns.sh
+          permissions: 0755

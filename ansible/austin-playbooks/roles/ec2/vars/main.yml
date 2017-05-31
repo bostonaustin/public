@@ -1,0 +1,12 @@
+---
+
+keypair: kp_se_eval
+remote_hostname: app-host-01
+instance_type: t2.micro
+region: us-east-1
+ami_image: ami-6edd3078
+instance_profile_name: skillseval   # IAM role
+az: us-east-1d                      # prod
+vpc_subnet_id: subnet-82bd5ba9      # prod
+security_group_name: sg-a2568ade    # prod
+ansible_user: ubuntu

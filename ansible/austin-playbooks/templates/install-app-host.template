@@ -1,0 +1,75 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "austin_eval test environment",
+    "Parameters": {
+        "subnetId": {
+            "Type": "String",
+            "Default": "subnet-82bd5ba9"
+        },
+        "sgID": {
+            "Type": "String",
+            "Default": "sg-a2568ade"
+        },
+        "keyName": {
+            "Description": "The private key that should be used to login to the instance",
+            "Type": "String",
+            "Default": "kp_se_eval.pem"
+        },
+        "imageId": {
+            "Description": "The ami that the instance will use",
+            "Type": "String",
+            "Default": "ami-6edd3078"
+        },
+        "instanceType": {
+            "Type": "String",
+            "Defalut": "t2.micro"
+        }
+        "groupName": {
+            "Type": "String",
+            "Default": "webservers"
+        },
+        "number": {
+            "Type": "String",
+            "Default": "0"
+        }
+    },
+    "Mappings": {},
+    "Resources": {
+        "appHost": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": { "Ref": "keyName"},
+                "DisableApiTermination": true,
+                "ImageId": { "Ref": "imageId" },
+                "InstanceType": { "Ref": "instanceType" },
+                "Monitoring": "false",
+                "SubnetId": { "Ref": "subnetId" },
+                "SecurityGroupIds": [{ "Ref": "sgID" }],
+                "Tags": [{
+                    "Key": "Name",
+                    "Value": {
+                        "Fn::Join": [
+                            "-",
+                            [{ "Ref": "groupName" }, webservers, { "Ref": "number"}]
+                        ]
+                    }
+                }]
+            }
+        }
+    },
+    "Outputs": {
+        "appHostIP": {
+            "Description": "Application Host IP",
+            "Value": { "Fn::GetAtt": [ "appHost", "PrivateIp" ] }
+        },
+        "appHostName": {
+            "Description": "Application Host Instance Name",
+            "Value": {
+                "Fn::Join": [
+                    "-",
+                    [{ "Ref": "groupName" }, webservers, { "Ref": "number"}]
+                ]
+            }
+        }
+    }
+}

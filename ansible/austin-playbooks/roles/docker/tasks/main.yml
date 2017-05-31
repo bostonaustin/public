@@ -1,0 +1,71 @@
+---
+    # service is 'docker' but apt-get pkg is 'docker-engine'
+  - hosts: webservers
+    gather_facts: True
+    become: true
+
+    tasks:
+      - name: DOCKER | Stop docker
+        service: name=docker state=stopped
+        when: stopped is defined and stopped == true
+
+      - name: DOCKER | uninstall docker
+        apt: name=docker-engine state=absent
+
+      - name: DOCKER | add key for docker
+        command: apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+
+      - name: DOCKER | adding docker signing key
+        apt_key: url=https://apt.dockerproject.org/gpg state=present
+
+      - name: DOCKER | adding sources.list deb url for docker
+        lineinfile: dest=/etc/apt/sources.list line="deb https://apt.dockerproject.org/repo ubuntu-trusty main"
+
+      - name: DOCKER | running apt-get update
+        apt:
+          update_cache: yes
+          autoremove: yes
+
+          #cache_valid_time: 7200
+
+      - name: DOCKER | running apt-get autoremove
+        apt:
+          autoremove: yes
+
+      - name: DOCKER | install packages required by docker
+        apt: update_cache=yes pkg={{ item }} state=installed
+        with_items:
+          - libsystemd-daemon-dev
+          - libcgmanger0
+          - libnih-dbus1
+          - libsystemd-journal0
+          - apt-transport-https
+          - ca-certificates
+          - libltdl7
+          - aufs-tools
+          - cgroup-lite
+          - linux-image-extra-virtual
+
+      - name: DOCKER | install latest kernel
+        apt: name=linux-image-extra-{{ ansible_kernel }} state=present
+        environment:
+          DEBIAN_FRONTEND: "noninteractive"
+
+      - name: DOCKER | ensure docker-engine application is installed
+        apt:
+          pkg: docker-engine
+          state: latest
+        notify:
+          - DOCKER | restart docker
+
+      - name: DOCKER | verify docker is running and enabled at boot
+        service: name=docker state=started enabled=yes
+
+      - name: DOCKER | Starting docker
+        service:
+          name: docker
+          state: started
+
+    handlers:
+      - name: DOCKER | restart docker
+        service: name=docker state=restarted

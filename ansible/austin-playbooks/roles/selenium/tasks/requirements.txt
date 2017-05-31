@@ -1,0 +1,8 @@
+setuptools>=3.2
+paramiko>=1.15.2
+nose>=1.3.4
+selenium>=2.44.0
+PyYAML
+Jinja2
+httplib2
+six

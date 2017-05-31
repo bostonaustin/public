@@ -1,0 +1,18 @@
+---
+
+  - hosts: webservers
+    become: true
+
+    tasks:
+      #- name: run a task
+      #  command: echo " Hello ... "
+
+  - include: roles/common/tasks/main.yml
+
+  - include: roles/nginx/tasks/main.yml
+
+  - include: roles/docker/tasks/install-docker.yml
+
+  - include: roles/petclinic/tasks/main.yml
+
+  - include: roles/selenium/tasks/main.yml

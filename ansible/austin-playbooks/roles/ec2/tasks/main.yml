@@ -1,0 +1,5 @@
+---
+
+  - name: Add the instance to known hosts
+    local_action: command sh -c 'ssh-keyscan -t rsa {{ ec2_ip_address }} >> $HOME/.ssh/known_hosts'
+    when: ec2_ip_address is defined

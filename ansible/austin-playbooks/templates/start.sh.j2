@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Get the directiory of this script
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+./configure
+
+chmod 600 /root/.ssh/kp_se_eval.pem
+
+docker run -d \
+  --name nginx \
+  --volume /mnt/data:/data \
+  --volume /mnt/logs:/logs \
+  -e SSL_CHALLENGE_DB_INDEX=3 \
+  -e MIN_TLS=1.0 \
+  -p 80:80 \
+  -p 443:443 \
+  -p 8080:8080 \
+  --restart=always \
+  --privileged \
+  {{ nginx_docker_image }}

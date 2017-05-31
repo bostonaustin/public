@@ -1,0 +1,12 @@
+-
+  include: python_basics.yml
+  vars:
+    python_packages_to_install:
+      - setuptools
+      - paramiko
+      - nose
+      - selenium
+      - PyYAML
+      - Jinja2
+      - httplib2
+      - six

@@ -1,0 +1,18 @@
+---
+
+  - hosts: webservers
+    become: true
+
+    tasks:
+      - name: git clone spring petclinic
+        git:
+          repo: git://github.com/spring-projects/spring-petclinic.git
+          dest: /opt/spring-petclinic
+          version: master
+
+      #- name: pull the petclinic docker image
+      #  docker_image:
+      #    name: anthonydahanne/spring-petclinic
+
+      - name: run spring-boot-run script
+        script: spring-boot-run.sh

@@ -1,0 +1,108 @@
+---
+  - hosts: webservers
+    become: yes
+
+    tasks:
+      - name: COMMON | install zlib1g-dev
+        apt:
+          name: zlib1g-dev
+          state: present
+
+      - name: COMMON | install libmysqlclient-dev
+        apt:
+          name: libmysqlclient-dev
+          state: present
+
+      - name: COMMON | install python-dev
+        apt:
+          name: python-dev
+          state: present
+
+      - name: COMMON | install gcc
+        apt:
+          name: gcc
+          state: present
+
+      - name: COMMON | install python-setuptools
+        apt:
+          name: python-setuptools
+          state: present
+
+      - name: COMMON | install git-core
+        apt:
+          name: git-core
+          state: present
+
+      - name: COMMON | install aptitude
+        apt:
+          name: aptitude
+          state: present
+
+      - name: COMMON | install tzdata pkg
+        apt:
+          name: tzdata
+          state: present
+
+      - name: COMMON | install tzdata-java pkg
+        apt:
+          name: tzdata-java
+          state: present
+
+      - name: COMMON | install Java openjdk-7-jre-headless pkg
+        apt:
+          name: openjdk-7-jre-headless
+          state: present
+
+      - name: COMMON | install Java openjdk-7-jre pkg
+        apt:
+          name: openjdk-7-jre
+          state: present
+
+      - name: COMMON | install Java openjdk-7-jdk pkg
+        apt:
+          name: openjdk-7-jdk
+          state: present
+
+      - name: COMMON | install maven2 pkg
+        apt:
+          name: maven2
+          state: present
+
+      - name: COMMON | pip install --upgrade pip
+        command: pip install --upgrade pip
+
+      - name: COMMON | pip install setuptools
+        pip: name=setuptools
+
+      - name: COMMON | pip install boto
+        pip: name=boto
+
+      #- name: COMMON | pip install paramiko
+      #  pip: name=paramiko
+
+      - name: COMMON | pip install nose
+        pip: name=nose
+
+      - name: COMMON | pip install selenium
+        pip: name=selenium
+
+      - name: COMMON | pip install PyYAML
+        pip: name=PyYAML
+
+      #- name: COMMON | pip install Jinga2
+      #  pip: name=Jinga2
+
+      - name: COMMON | pip install httplib2
+        pip: name=httplib2
+
+      - name: COMMON | pip install six
+        pip: name=six
+
+      - name: COMMON | pip install docker-py
+        pip: name=docker-py
+
+      #- name: SELENIUM | run install-pip.sh to execute pip install -r to by-pass broken 'pip' module
+      #  script: install-pip.sh
+
+      #- name: SELENIUM | install pip requirements.txt to pull-down latest modules for selenium
+      #  pip: requirements=/media/psf/Home/Dropbox/austin-playbooks/roles/selenium/tasks/requirements.txt

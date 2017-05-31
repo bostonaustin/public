@@ -1,0 +1,21 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.ssh.insert_key = false
+
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  config.vm.network "forwarded_port", guest: 443, host: 8443
+
+  config.vm.provision :shell, path: "files/bootstrap.sh"
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "512"]
+  end
+
+  config.vm.define "vagrant-webserver" do |inventory|
+    inventory.vm.box = "ubuntu/trusty64"
+    inventory.vm.hostname = "vagrant-webserver"
+    inventory.vm.network :private_network, ip: "192.168.28.70"
+  end
+end

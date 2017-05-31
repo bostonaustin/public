@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-# Cards Module
-# Basic classes for a game with playing cards
+# Cards Module - demos classes for any game using playing cards
+#    *required* by blackjack.py
 
 class Card(object):
     """ A playing card. """

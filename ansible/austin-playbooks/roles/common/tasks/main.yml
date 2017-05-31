@@ -1,0 +1,105 @@
+---
+
+  - hosts: all
+    become: true
+
+    tasks:
+      - name: COMMON | send ssh id_rsa.pub
+        copy:
+          src: /root/.ssh/id_rsa.pub
+          dest: /root/.ssh/authorized_keys
+          mode: 0600
+
+      - name: COMMON | add key for http://nginx.org trusty
+        command: apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys ABF5BD827BD9BF62
+
+      - name: COMMON | add key for https://apt.dockerproject.org ubuntu-trusty
+        command: apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys
+
+      - name: COMMON | apt-get update
+        apt:
+          update_cache: yes
+          cache_valid_time: 1800
+          #upgrade: yes
+
+      #- name: COMMON | apt-get autoremove to clear the apt-cache
+      #  apt:
+      #    autoremove: yes
+
+      - name: COMMON | install aptitude
+        apt:
+          name: aptitude
+          state: present
+
+
+      - name: COMMON | install git tools
+        apt:
+          name: git
+          state: present
+
+      - name: COMMON | install aptitude
+        apt:
+          name: aptitude
+          state: present
+
+      - name: COMMON | install python
+        apt:
+          name: python
+          state: present
+
+      - name: COMMON | install nmap pkg
+        apt:
+          name: nmap
+          state: present
+
+      - name: COMMON | install unzip pkg
+        apt:
+          name: unzip
+          state: present
+
+      - name: COMMON | install python-pip pkg
+        apt:
+          name: python-pip
+          state: present
+
+      - name: COMMON | install build-essential pkg
+        apt:
+          name: build-essential
+          state: present
+
+      - name: COMMON | install zip pkg
+        apt:
+          name: zip
+          state: present
+
+# SYNTAX ERRORS
+#    - name:
+#      - name: Install the base packages
+#        apt:
+#          pkg={{ item }} state=installed
+#        with_items:
+#          - aptitude
+#          - software-properties-common
+#          - python-setuptools
+#          - python-dev
+#          - g++
+#          - python2.7-dev
+#          - sshpass
+#          - autoconf
+#          - python-pip
+#          - libssl-dev
+#          - libffi-dev
+#          - build-essential
+#          - unzip
+#          - zip
+#          - nmap
+#          - python
+#          - default-jre
+#
+# BOTH FAIL TO PARSE -- says missing qoutes for below
+#
+#      - name: Install Python packages: "{{ python_packages_to_COMMON | install }}"
+#        pip: name={{ item }}
+#        with_items: python_packages_to_install
+#
+#          - include: python_basics.yml

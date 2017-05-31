@@ -1,0 +1,8 @@
+---
+  - hosts: webservers
+    become: true
+
+    tasks:
+      # Install Docker 1.9.1 via shell script
+      - name:  Run the install_docker.sh script
+        script:  install-docker.sh

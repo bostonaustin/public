@@ -1,6 +1,6 @@
 #!/bin/bash
-# @description:     loop to rsync directories in web app farm
- 
+# simple loop to rsync directories in web app farm
+
 app_servers="lab-app01 lab-app02 lab-app03 lab-app04"
 
 if [[ -e /tmp/rsyncprod.tmp ]]
