@@ -1,16 +1,16 @@
 #!/bin/bash
-# @date:            10feb15
-# @author:          Austin Matthews
-# @description:     upgrade example application software
-# @examples:        upgrade.sh -v 1.0.0
 
-# @variables:    change repo here until added as arg option
+# Usage: upgrade.sh -v 1.0.0
+# pulls the latest version of software Application from custom repository 
+# installs the new package after backing up the current settings, if necessary
+# -b can be used to backout a bad package and revert to previous settings
+
 LIST="/etc/apt/sources.list"
 VFLAG=${1:-"-v"}
-DEFVER="1.0.0"                              # Default version is 1.0.0
+DEFVER="1.0.0"                              # default version is 1.0.0
 VER=${2:-$DEFVER}
 RFLAG=${3:-"-r"}
-DEFREPO="prod"                              # Default repo is prod
+DEFREPO="prod"                              # default repo is prod
 REPO=${4:-$DEFREPO}
 CURR_VER=$DEFVER
 EXAMPLE_REPO=repo.example.com
@@ -19,8 +19,9 @@ HOUR=`date +"%R"`
 TODAY=`date +"%d%^b%Y"`
 YEARMONTH=`date +"%Y-%m"`
 
-# @functions:
-function createDir {
+# check to see if a dir exists and create if missing
+create_directory() 
+{
   if [ ! -d "$1" ]; then
     sudo mkdir "$1"
     echo "  [OK]" "$1" "created "
@@ -29,24 +30,25 @@ function createDir {
   fi
 }
 
-function checkLast {
+# verifiy the last command ran sucessfully 
+check_last_command() 
+{
   if [ ! $1 -eq 0 ]; then
-    echo "[ERROR] " "checkLast on" "$2"
+    echo "[ERROR] " "check_last_cmd on" "$2" 
     exit 1
   fi
 }
 
-function USAGEXIT ()
+usage_exit ()
 {
   printf "Usage: %s [options] -v|version -b|backout -h|help \n" $(basename $0)
   echo ""
-  SHOWHELP
+  show_help
   exit 2
 } >&2
 
-function RUNBACKOUT {
-  echo ""
-  echo " *** example SOFTWARE BACKOUT REQUESTED  *** "
+run_backout() 
+{
   echo ""
   echo " *** THIS WILL DESTROY YOUR CURRENT SETTINGS and RESTORE RELEASE $VER CONFIGURATION *** "
   echo ""
@@ -67,18 +69,16 @@ function RUNBACKOUT {
  echo "  restoring the backup taken from $VER... "
  rsync -arl /opt/$VER/example/ /opt/example/
  echo "    [SUCCESS] last upgrade has been backed-out and system is restored to $VER configuration "
-       echo "    [WARN] May need manual effort to reconfigure syscfg and other configurations "
        sudo -u example PYTHONPATH=/opt/example python /opt/example/common/utilities/sys_procs.py -u
     fi
   else
-    echo ""
     echo "[EXIT] BACKOUT operation cancelled "
-    echo ""
     exit 0
   fi
 }
 
-function SHOWHELP {
+show_help() 
+{
   echo "Usage: upgrade.sh [options] "
   echo ""
   echo "Options: "
@@ -99,53 +99,17 @@ function SHOWHELP {
   echo ""
 }
 
-function FIXPERMS {
-  if [ -d /opt/example ]; then
-    echo "checking /opt/example folder perms and ownership ... "
-    chmod -R 700 /opt/example
-    find /opt/example -type d -exec chmod 755 {} \;
-    chmod 444 /opt/example/Makefile
-    chmod 444 /opt/example/requirements.txt
-    chmod 444 /opt/example/version
-    chmod 755 /opt/example/monitor/nrpe_plugins/*
-    chmod 644 /opt/example/.env
-    find /opt/example -name "*.py" -exec chmod 755 {} \;
-    find /opt/example -name "*.sh" -exec chmod 755 {} \;
-    find /opt/example -name "*.cql" -exec chmod 750 {} \;
-    find /opt/example -name "*.odt" -exec chmod 644 {} \;
-    find /opt/example -name "*.rst" -exec chmod 644 {} \;
-    find /opt/example -name "*.org" -exec chmod 644 {} \;
-    find /opt/example -name "*.conf" -exec chmod 644 {} \;
-    find /opt/example -name "*.cfg" -exec chmod 644 {} \;
-    find /opt/example -name "*.list" -exec chmod 644 {} \;
-    find /opt/example -name "*.properties" -exec chmod 644 {} \;
-    find /opt/example -name "*.skel" -exec chmod 444 {} \;
-    find /opt/example -name "*.txt" -exec chmod 444 {} \;
-    find /opt/example -name "*README" -exec chmod 444 {} \;
-    find /opt/example -name "*.pyc" -exec rm -f {} \;
-    echo "  [OK] folder permissions and owners are correct "
-  else
-    echo "  [ERROR] check /opt/example for perms or owner issues "
-  fi
-}
-
-## Start Upgrade Script
-
-# DISABLE for development
-# remove comment for internal only for command line testing purposes
-#checkLast 1 "This is an internal script. Use 'install-server.sh' instead."
-
 # max args
 if [ $# -gt 4 ]; then
 echo "  [ERROR] too many arguments given "
-  USAGEXIT
+  usage_exit
 fi
 
 ## take action if CLI args given
 while getopts ":b:v:r:h" opt; do
   case $opt in
     b  ) VER=$OPTARG 
-         RUNBACKOUT
+         run_backout
          exit 0
          ;;
     v  ) VER=$OPTARG
@@ -156,10 +120,10 @@ while getopts ":b:v:r:h" opt; do
            REPO=$OPTARG
          fi
          ;;
-    h  ) SHOWHELP
-         USAGEXIT
+    h  ) show_help
+         usage_exit
          ;;
-    *  ) USAGEXIT
+    *  ) usage_exit
   esac
 done
 
@@ -168,13 +132,13 @@ if [ -f /opt/example/conf/host.properties ]; then
   CURR_VER=(`grep -m 1 "CURR_VER" /opt/example/conf/host.properties  | awk -F "=" '{print $2}' `)
 fi
 if [ "$CURR_VER" == "" ]; then
-  checkLast 1 "Missing Current Version! double-check host.properties "
+  check_last_command 1 "Missing Current Version! double-check host.properties "
 fi
 if [ -f /opt/example/conf/site.properties ]; then
   EXAMPLE_REPO=(`grep "EXAMPLE_REPO" /opt/example/conf/site.properties | grep -v "^#" | awk -F "=" '{print $2}' `)
 fi
 if [ "$EXAMPLE_REPO" == "" ]; then
-  checkLast 1 "Missing EXAMPLE_REPO! - double-check site.properties "
+  check_last_command 1 "Missing EXAMPLE_REPO! - double-check site.properties "
 fi
 
 ## check for correct user
@@ -195,22 +159,11 @@ export PYTHONPATH=/opt/example
 exec > >(tee -a /home/example/upgrade.log.$TODAY) 2>&1
 echo "*** example application software upgrade started at $NOW *** "
 
-## DEBUG - uncomment for debug level messages
-#echo "DEBUG MESSAGES: "
-#echo "  arg1 is set to $VFLAG"
-#echo "  version set to $VER"
-#echo "  curr version set to $CURR_VER"
-#echo "  repo is set to $REPO"
-#echo "  EXAMPLE_REPO is set to $EXAMPLE_REPO "
-#echo "  $0: $# parameters:"
-#echo " ... sleeping for 15 seconds - ctrl-c to exit ... "
-#sleep 15
-
 ## check for existing .example directories
 echo "checking system for previous upgrades ... "
 if [ ! -d /opt/$CURR_VER ]; then
   echo "  [WARN] no backups folder found "
-  createDir /opt/$CURR_VER
+  create_directory /opt/$CURR_VER
 else
   echo "  [WARN] Previous backup folder detected, removing its contents "
   rm -rf /opt/$CURR_VER/* &> /dev/null
@@ -274,7 +227,7 @@ if [ -d /opt/example ]; then
   rsync -arl /opt/example /opt/$CURR_VER
   echo "  [OK] active /opt/example copied to /opt/$CURR_VER "
 else
-  checkLast 1 "Missing /opt/example directory! Aborting at $NOW "
+  check_last_command 1 "Missing /opt/example directory! Aborting at $NOW "
 fi
 
 ## APT switch to PROD, DEVEL or QA repos with -r repo
@@ -301,11 +254,8 @@ fi
 ## install example deb package
 apt-get update -yqq
 apt-get install --reinstall example=$VER* --force-yes -yqq
-checkLast $? "Failed to retrieve example package! Aborting at $NOW"
+check_last_command $? "Failed to retrieve example package! Aborting at $NOW"
 echo "  [OK] latest example $REPO version installed successfully "
-
-# check /opt/example perms
-FIXPERMS
 
 ## CASS DB schema upgrade
 echo "checking for cassandra DB schema verification ... "

@@ -1,8 +1,8 @@
 #!/bin/bash
-# @description:     verify the raid configuration
-# @author:          Austin Matthews
+# setup or verify the server's raid configuration is ready for application
 
-function createDir {
+create_directory() 
+{
     if
     [ ! -d "$1" ]; then
         sudo mkdir "$1"
@@ -12,7 +12,8 @@ function createDir {
     fi
 }
 
-function checkLast {
+check_last_command()
+{
   if [ ! $1 -eq 0 ]; then
     echo "*** Check failure:"
     echo "*** $2"
@@ -31,19 +32,8 @@ else
   echo "  [OK] starting to verify the RAID configuration for this node."
 fi
 
-## WORKS OK too
-#if [ $(ls /usr/bin/facter 2>/dev/null | wc -l) -lt 1 ]; then
-#  apt-get install facter
-#else
-#  echo ""
-#  echo "  [OK] facter is installed and found properly."
-#fi
-## OR this one
-#if [ ! -f "/usr/bin/facter" ]; then
-#  apt-get install facter -y --force-yes
-#fi
-
 is_facter="/usr/bin/facter"
+
 if [ -f "$is_facter" ]; then
   echo ""
   echo "  [OK] $is_facter is installed and found properly."
@@ -57,7 +47,7 @@ else
 fi
 
 [ `which facter` == /usr/bin/facter ]
-checkLast $? "[ERROR] exiting because facter is not installed properly ..."
+check_last_command $? "[ERROR] exiting because facter is not installed properly ..."
 
 if [ `/usr/bin/facter kernelrelease` != 3.2.0-58-generic ]; then
   echo ""
@@ -68,8 +58,7 @@ if [ `/usr/bin/facter kernelrelease` != 3.2.0-58-generic ]; then
   exit 1
 fi
 
-## DETECT a VM enviroment and exit for now
-## NEEDS - another install type or seperate set of HOST_TYPE(s)
+## DETECT a VM enviroment and exit (at least for now)
 if [ `/usr/bin/facter is_virtual` != false ]; then
   echo ""
   echo "[ERROR] this operation is not required for Virtual environments."
@@ -106,13 +95,9 @@ if [ `/usr/bin/facter physicalprocessorcount` == 1 ]; then
   fi
 fi
 
-echo ""
-echo "  [OK] Storaint Approved Server Detected."
-echo ""
-echo "  [OK] Host type detected: $HOST_TYPE"
-echo ""
-echo "  [OK] Install type detected: $INSTALL_TYPE"
-echo ""
+echo "  [OK] Compatible Server Detected"
+echo "       Host type detected: $HOST_TYPE"
+echo "       Install type detected: $INSTALL_TYPE"
 
 if [ "$HOST_TYPE" != "STOR" ]; then
   df -H | grep '/data' 1> /dev/null 2> /dev/null
@@ -132,10 +117,10 @@ if [ "$HOST_TYPE" != "STOR" ]; then
     fi
     if [ "$HOST_TYPE" != "MGMT" ] || [ $MGMTN -eq 1 ]; then
       echo "y" | mkfs -t ext3 $MDDEV
-      createDir "/data"
+      create_directory "/data"
       mount $MDDEV /data
       df -H | grep '/data' 1> /dev/null 2> /dev/null
-      checkLast $? "Failed DATA RAID configuration. Aborting RAID tool"
+      check_last_command $? "Failed DATA RAID configuration. Aborting RAID tool"
       echo "# /data was on $MDDEV during installation" >> /etc/fstab
       UUID=`lsblk -o UUID,MOUNTPOINT | grep -m 1 '/data' | awk '{print $1}'`
       echo "UUID=$UUID  /data ext3 nobootwait 0 0" >> /etc/fstab
@@ -166,10 +151,10 @@ if [ "$HOST_TYPE" == "CASS" ]; then
       SSDDEV="/dev/sde"
     fi
     echo y | mkfs -t ext3 $SSDDEV
-    createDir "/ssd"
+    create_directory "/ssd"
     mount $SSDDEV /ssd
     df -H | grep '/ssd' 1> /dev/null 2> /dev/null
-    checkLast $? "Failed SSD configuration. Aborting RAID tool"
+    check_last_command $? "Failed SSD configuration. Aborting RAID tool"
     UUID=`lsblk -o UUID,MOUNTPOINT | grep -m 1 '/ssd' | awk '{print $1}'`
     echo "# /ssd was on $SSDDEV during installation" >> /etc/fstab
     echo "UUID=$UUID /ssd ext3 nobootwait 0 0" >> /etc/fstab

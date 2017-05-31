@@ -1,0 +1,11 @@
+#!/bin/bash
+# create a basic NGINX webserver with static content
+
+# run updates and enable services to start at boot
+yum install httpd -y
+yum update -y
+service httpd start
+chkconfig httpd on
+
+# create the index file for NGINX
+echo "<html><h1>Greetings Professor Falken, shall we play a game?</h1></html>" > /var/www/html/index.html

@@ -1,12 +1,9 @@
-#!/bin/bash
-# @date:            11nov14
-# @author:          Austin Matthews
-# @description:     expect snippet to export SSH keys to PEER node
-#                   typically used in building a High Availability node set
-#                   also, good for creating ssh without password pairs
+#!/usr/bin/expect
+# export SSH keys to PEER node to build a High Availability node set
 
 # ssh user on remote server being granted ssh without password
 USER="root"
+
 # remote server, DNS name or IP, being added to local ssh authorized keys
 PEER=remote-peer
 
@@ -61,7 +58,11 @@ while [ ! -f /tmp/id_rsa.pub ]; do
   echo "Waiting for $PEER to send its public key"
   sleep 10
 done
+
+# copy keys to ~/.ssh folder
 cat /tmp/id_rsa.pub > /$USER/.ssh/authorized_keys
 rm /tmp/id_rsa.pub
 chmod 700 /$USER/.ssh/authorized_keys
+
+# exit and set return code to sucess
 exit 0

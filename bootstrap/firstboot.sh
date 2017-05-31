@@ -1,14 +1,7 @@
 #!/bin/bash
-# firstboot.sh
-# Debian 12.04 installation bootstrap  (for CD install with or without network)
-# In case of offline installation, the install files should be on USB mounted
-# as /media/usb or CD mounted at /media/cdrom
-# The content of CD/USB:
-#       /media/usb/install or /media/cdrom/install   - files needed for bootstrap
-#       /media/usb/archives or /media/cdrom/archives - deb packages needed for install
-#       /media/usb/eggs or /media/cdrom/eggs         - zip files for pip modules
+# example of how-to configure a node from CD or USB drive
+# create a init file to be run on first boot of the machine
 
-# set variables
 VERSION=1.0.0
 REPO=install.example.com
 
@@ -50,15 +43,13 @@ set -x -v
 exec 1>/home/example/.firstboot.log 2>&1
 
 # create minimum directory structure
-mkdir /opt
-mkdir /opt/example
 mkdir /opt/example/conf
 mkdir /opt/example/install
 mkdir /var/log/example
 chown example:example /var/log/example
 chown -R example:example /opt/example
 
-# Set apt to example
+# set apt to example
 if [ ! -e "/etc/apt/sources.list.bkp" ]; then
   cp /etc/apt/sources.list /etc/apt/sources.list.bkp
 fi
@@ -66,9 +57,7 @@ fi
 # modify apt sources.list
 case $MEDIA in
   network)
-### New per version way
 cat > /etc/apt/sources.list << EOF
-# pull example app from example.com
 deb http://$REPO/$VERSION/archives ./
 EOF
           ;;
@@ -96,14 +85,14 @@ esac
 chmod 755 /opt/example/install/install-server.sh
 chown -R example:example /opt/example
 
-## clean up
+# clean up
 update-rc.d -f firstboot remove
 rm /etc/init.d/firstboot
 rm /root/firstboot*.sh
 rm -rf /root/nohup.out
 date
 
-## fix apt-get missing pubkeys
+# fix apt-get missing pubkeys
 cd /tmp
 tar xzvf apt-keys.tgz 
 apt-key add apt-key-2847.asc 
@@ -112,7 +101,7 @@ rm apt-key*
 
 /usr/bin/apt-get update -y -qq
 
-## set kernel to 3.2.0-58
+# set kernel to 3.2.0-58
 if [ `uname -r` != "3.2.0-58-generic" ]; then
   apt-get install -y linux-image-3.2.0-58-generic linux-headers-3.2.0-58-generic --force-yes
   apt-mark hold linux-image-3.2.0-58-generic linux-headers-3.2.0-58-generic

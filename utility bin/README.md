@@ -1,4 +1,6 @@
-[devops bin](https://github.com/bostonaustin/public/blob/master/devops%20bin/add_nis_user.sh)
-- bin folder for Ops automation of creating users
-- configure software packages 
-- backup network devices
+[utility bin] binaries to troubleshoot and fix server performance issues
+- repo of personal bin folder for DevOps automation 
+- random scripts demostrating code syntax -- some practical and some academic
+- personal Library of Bash Shell functions to re-use code in multiple scripts
+- init and startup scripts to configure software packages 
+- expect script to configure ssh-no-password between nodes

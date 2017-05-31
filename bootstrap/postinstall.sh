@@ -1,8 +1,5 @@
 #!/bin/sh
-# @description:     postinstall.sh preps firstboot script to run cmds and updates
-#                   this gets run during CD or ISO after the OS is finished installing
-#                   pulls the management server template to configure the server for monitoring
-# @author:          Austin Matthews
+# pulls an instance's firstboot init.d script from web
 
 # grab firstboot script
 /usr/bin/curl -o /root/firstboot-mgmt.sh http://example.com/install/firstboot-mgmt.sh

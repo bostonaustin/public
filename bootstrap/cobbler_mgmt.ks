@@ -1,5 +1,5 @@
 # cobbler kickstart template in /var/lib/cobbler/kickstarts/example-mgmt
-# install + configure a new management server with icinga + logstash + cobbler + puppet
+# configure management server with icinga + logstash + cobbler + puppet
 
 # first call the 'example-base' set of packages for all server types
 d-i debian-installer/locale string en_US.UTF-8
