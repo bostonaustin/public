@@ -3,7 +3,7 @@ code samples and reference materials
 
    [ansible](https://github.com/bostonaustin/public/blob/master/ansible/)
    * a single ec2 webserver running petclinic with Maven, NGINX and Spring
-   
+
    [bootstrap](https://github.com/bostonaustin/public/blob/master/bootstrap/)
    * AWS user_data for a replace-able WordPress blog with S3 sync
    * AWS CloudFormation template for a self-healing, multi-AZ WP Blog
