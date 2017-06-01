@@ -19,7 +19,7 @@ Code Samples and Reference Materials
    [python](https://github.com/bostonaustin/public/tree/master/python)
    * last production script I wrote -- checking SSL expiration dates
    * second to last production script -- creates an AWS RDS snapshot
-   * reference syntax basics with tic-tac-toe, blackjack and geek translator dictionary
+   * reference syntax basics with tic-tac-toe, blackjack and fibonacci sequence
 
    [utility_bin](https://github.com/bostonaustin/public/blob/master/utility_bin/)
    * binaries for everyday usage, automating jobs and troubleshooting purposes
