@@ -1,7 +1,6 @@
 # austin-playbook 
-# ansible playbooks
 
-set of playbooks that are used to create an AWS instance running nginx and petclinic app
+create a standalone AWS instance running nginx, spring, maven and petclinic app
 
 a. Pre-requisites for Ansible Control Station (i.e. your laptop or build-host)
   - root user access/privileges `$ sudo -i` or `$ su`
