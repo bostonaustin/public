@@ -1,4 +1,4 @@
-Code Samples and Reference Materials
+code samples and reference materials
 ------------------------------------
 
    [ansible](https://github.com/bostonaustin/public/blob/master/ansible/)
