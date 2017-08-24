@@ -1,0 +1,32 @@
+#[webservers]
+#vagrant ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/media/psf/Home/Dropbox/austin-playbooks/vagrant/files/ubuntu_vagrant
+#54.242.89.36 ansible_ssh_host=54.242.89.36 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/root/.ssh/kp_se_eval.pem
+
+[colab]
+cihcisdapp737v
+cihcisdapp738
+cihcisdapp835
+cihcissapp890v
+cihcissapp891v
+cihcissapp892v
+cihcissapp893v
+cihcissapp991
+cihcissapp990
+alpcispapp684v
+alpcispapp685v
+alpcispapp686v
+alpcispapp687v
+alpcispapp701v
+alpcispapp702v
+alpcispapp703v
+alpcispapp704v
+loncispapp319v
+loncispapp320v
+sincispapp307v
+sincispapp308v
+blrcispcdn001
+blrcispcdn002
+alpcispapp730
+alpcispapp731
+alpcispapp760
+alpcispapp767

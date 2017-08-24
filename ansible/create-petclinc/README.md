@@ -48,7 +48,7 @@ Create a standalone AWS ec2 instance running nginx, maven, spring and petclinic 
   ~~~
 
 ### INSTALL -- Run playbooks from ~/austin-playbooks ###
-  * `ansible-playbook launch-instance.yml`
+  * `ansible-playbook create-petclinic.yml`
   * `ansible-playbook webservers.yml`
 
 ### Clean-up ###
