@@ -115,10 +115,10 @@ aws_secret_access_key = hblahMjblahqblahdi5w8G4jyQpxEsJ6t3lVP5sM
 EOC
   chmod 600 ${AWS_CONFIG}
   if [[ ${ANSIBLE_HOSTS} == "" ]]; then
-    echo "export ANSIBLE_HOSTS=/root/austin-playbooks/ec2.py" >> ~/.bash_profile
+    echo "export ANSIBLE_HOSTS=/root/create-petclinc-node/ec2.py" >> ~/.bash_profile
   fi
   if [[ ${EC2_INI_PATH} == "" ]]; then
-    echo "export EC2_INI_PATH=/root/austin-playbooks/ec2.ini" >> ~/.bash_profile
+    echo "export EC2_INI_PATH=/root/create-petclinc-node/ec2.ini" >> ~/.bash_profile
   fi
   if [[ ${AWS_DEFAULT_PROFILE} == "" ]]; then
     echo "export AWS_DEFAULT_PROFILE=default" >> ~/.bash_profile
@@ -185,12 +185,12 @@ ssh-add -l
 if [ $? == 2 ]; then
   echo "[warning] manually run this to setup ssh-agent for AWS and vagrant keys:"
   echo " "
-  echo -e '  eval $(ssh-agent); ssh-add /root/.ssh/kp_se_eval.pem; ssh-add /media/psf/Home/Dropbox/austin-playbooks/vagrant/files/ubuntu_vagrant; ssh-add -l '
+  echo -e '  eval $(ssh-agent); ssh-add /root/.ssh/kp_se_eval.pem; ssh-add /media/psf/Home/Dropbox/create-petclinc-node/vagrant/files/ubuntu_vagrant; ssh-add -l '
 else
   echo "[warning] ssh-agent is already running -- double-check the keys loaded with 'ssh-add -l'"
   echo "          manually run this to setup ssh-agent for AWS and vagrant keys:"
   echo " "
-  echo -e '          pkill ssh-agent; eval $(ssh-agent); ssh-add /root/.ssh/kp_se_eval.pem; ssh-add /media/psf/Home/Dropbox/austin-playbooks/vagrant/files/ubuntu_vagrant; ssh-add -l '
+  echo -e '          pkill ssh-agent; eval $(ssh-agent); ssh-add /root/.ssh/kp_se_eval.pem; ssh-add /media/psf/Home/Dropbox/create-petclinc-node/vagrant/files/ubuntu_vagrant; ssh-add -l '
 fi
 # success -- drop breadcrumb to avoid extra work on next execution
 touch ~/.preinstall_has_run_breadcrumb
