@@ -1,0 +1,9 @@
+---
+
+  - hosts: all
+    gather_facts: False
+    tags: decommission
+
+    tasks:
+      - name: shut down the instance to prep for de-commissioning
+        command: pimsu init 0
