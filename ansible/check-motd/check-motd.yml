@@ -1,0 +1,9 @@
+---
+
+  - hosts: all
+    gather_facts: False
+    tags: decommission
+
+    tasks:
+      - name: verify the etc motd on hosts
+        command: /bin/cat /etc/motd
