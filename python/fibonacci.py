@@ -8,6 +8,7 @@ def fibonacci(max):
         yield a
         a,b = b,b+a
 
+
 '''to print out the seq until it hits 500'''
 for num in fibonacci(500):
     print(num, end=' ')
@@ -15,6 +16,7 @@ for num in fibonacci(500):
 ''' output:
 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377     
 '''
+
 
 '''for vertical output'''
 for num in fibonacci(7):
