@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__author__ = 'Austin Matthews'
+
 """ simple doctest example """
 
 small_words = ('into', 'the', 'a', 'of', 'at', 'in', 'for', 'on')
